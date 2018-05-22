@@ -22,12 +22,7 @@ DumpStyle(xtc/vel,DumpXTCvel)
 
 #include "dump.h"
 
-#ifdef LAMMPS_XDR
 #include "xdr_compat.h"
-#else
-#include "rpc/rpc.h"
-#include "rpc/xdr.h"
-#endif
 
 namespace LAMMPS_NS {
 
