@@ -346,6 +346,8 @@
 /dump_vtk.h
 /dump_xtc.cpp
 /dump_xtc.h
+/dump_xtcvel.cpp
+/dump_xtcvel.h
 /dump_xyz_mpiio.cpp
 /dump_xyz_mpiio.h
 /ewald.cpp
