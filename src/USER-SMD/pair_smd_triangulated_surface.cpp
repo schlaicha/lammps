@@ -26,10 +26,13 @@
    Contributing author: Mike Parks (SNL)
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <float.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cfloat>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <iostream>
+#include <Eigen/Eigen>
 #include "pair_smd_triangulated_surface.h"
 #include "atom.h"
 #include "domain.h"
@@ -43,9 +46,6 @@
 #include "neigh_request.h"
 #include "memory.h"
 #include "error.h"
-#include <Eigen/Eigen>
-#include <stdio.h>
-#include <iostream>
 
 using namespace std;
 using namespace LAMMPS_NS;
@@ -834,7 +834,7 @@ double PairTriSurf::clamp(const double a, const double min, const double max) {
         }
 }
 
-void *PairTriSurf::extract(const char *str, int &i) {
+void *PairTriSurf::extract(const char *str, int &/*i*/) {
         //printf("in PairTriSurf::extract\n");
         if (strcmp(str, "smd/tri_surface/stable_time_increment_ptr") == 0) {
                 return (void *) &stable_time_increment;

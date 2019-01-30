@@ -32,16 +32,16 @@
 ------------------------------------------------------------------------- */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "atom.h"
 #include "force.h"
 #include "update.h"
 #include "respa.h"
 #include "error.h"
 #include "group.h"
-#include <math.h>
+#include <cmath>
 #include "input.h"
 #include "variable.h"
 #include "citeme.h"
@@ -307,7 +307,7 @@ void FixNVEManifoldRattle::update_var_params()
 
 /* -----------------------------------------------------------------------------
    ---------------------------------------------------------------------------*/
-int FixNVEManifoldRattle::dof(int igroup)
+int FixNVEManifoldRattle::dof(int /*igroup*/)
 {
   int *mask = atom->mask;
   int nlocal = atom->nlocal;
@@ -348,7 +348,7 @@ double FixNVEManifoldRattle::memory_usage()
 
 /* -----------------------------------------------------------------------------
    ---------------------------------------------------------------------------*/
-void FixNVEManifoldRattle::initial_integrate(int vflag)
+void FixNVEManifoldRattle::initial_integrate(int /*vflag*/)
 {
   update_var_params();
   nve_x_rattle(igroup, groupbit);

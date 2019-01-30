@@ -11,9 +11,9 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstring>
+#include <cstdlib>
+#include <cmath>
 #include "fix_langevin_drude.h"
 #include "atom.h"
 #include "force.h"
@@ -157,7 +157,7 @@ void FixLangevinDrude::init()
 
 /* ---------------------------------------------------------------------- */
 
-void FixLangevinDrude::setup(int vflag)
+void FixLangevinDrude::setup(int /*vflag*/)
 {
   if (!strstr(update->integrate_style,"verlet"))
     error->all(FLERR,"RESPA style not compatible with fix langevin/drude");

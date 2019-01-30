@@ -15,10 +15,10 @@
    Contributing author: Ray Shan (Sandia)
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "fix_qeq_shielded.h"
 #include "atom.h"
 #include "comm.h"
@@ -111,7 +111,7 @@ void FixQEqShielded::init_shielding()
 
 /* ---------------------------------------------------------------------- */
 
-void FixQEqShielded::pre_force(int vflag)
+void FixQEqShielded::pre_force(int /*vflag*/)
 {
   if (update->ntimestep % nevery) return;
 

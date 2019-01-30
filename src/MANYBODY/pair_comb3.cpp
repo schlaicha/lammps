@@ -17,10 +17,10 @@
                       Dundar Yilmaz (dundar.yilmaz@zirve.edu.tr)
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "pair_comb3.h"
 #include "atom.h"
 #include "comm.h"
@@ -310,25 +310,21 @@ double PairComb3::init_one(int i, int j)
 
 void PairComb3::read_lib()
 {
-  unsigned int maxlib = 1024;
+  const unsigned int MAXLIB = 1024;
   int i,j,k,l,nwords,m;
   int ii,jj,kk,ll,mm,iii;
-  char s[maxlib];
+  char s[MAXLIB];
   char **words = new char*[80];
 
   // open libraray file on proc 0
 
   if (comm->me == 0) {
     FILE *fp = force->open_potential("lib.comb3");
-    if (fp == NULL) {
-      char str[128];
-      sprintf(str,"Cannot open COMB3 lib.comb3 file");
-      error->one(FLERR,str);
-    }
+    if (fp == NULL) error->one(FLERR,"Cannot open COMB3 lib.comb3 file");
 
     // read and store at the same time
-    fgets(s,maxlib,fp);
-    fgets(s,maxlib,fp);
+    fgets(s,MAXLIB,fp);
+    fgets(s,MAXLIB,fp);
     nwords = 0;
     words[nwords++] = strtok(s," \t\n\r\f");
     while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -339,7 +335,7 @@ void PairComb3::read_lib()
     ccutoff[4] = atof(words[4]);
     ccutoff[5] = atof(words[5]);
 
-    fgets(s,maxlib,fp);
+    fgets(s,MAXLIB,fp);
     nwords = 0;
     words[nwords++] = strtok(s," \t\n\r\f");
     while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -351,7 +347,7 @@ void PairComb3::read_lib()
     ch_a[5] = atof(words[5]);
     ch_a[6] = atof(words[6]);
 
-    fgets(s,maxlib,fp);
+    fgets(s,MAXLIB,fp);
     nwords = 0;
     words[nwords++] = strtok(s," \t\n\r\f");
     while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -359,7 +355,7 @@ void PairComb3::read_lib()
     nsplrad = atoi(words[1]);
     nspltor = atoi(words[2]);
 
-    fgets(s,maxlib,fp);
+    fgets(s,MAXLIB,fp);
     nwords = 0;
     words[nwords++] = strtok(s," \t\n\r\f");
     while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -367,7 +363,7 @@ void PairComb3::read_lib()
     maxy = atoi(words[1]);
     maxz = atoi(words[2]);
 
-    fgets(s,maxlib,fp);
+    fgets(s,MAXLIB,fp);
     nwords = 0;
     words[nwords++] = strtok(s," \t\n\r\f");
     while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -376,7 +372,7 @@ void PairComb3::read_lib()
     maxconj = atoi(words[2]);
 
     for (l=0; l<nsplpcn; l++) {
-      fgets(s,maxlib,fp);
+      fgets(s,MAXLIB,fp);
       nwords = 0;
       words[nwords++] = strtok(s," \t\n\r\f");
       while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -385,14 +381,14 @@ void PairComb3::read_lib()
       dvmaxxcn[l] = atof(words[3]);
     }
 
-    fgets(s,maxlib,fp);
+    fgets(s,MAXLIB,fp);
     nwords = 0;
     words[nwords++] = strtok(s," \t\n\r\f");
     while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
     ntab = atoi(words[0]);
 
     for (i=0; i<ntab+1; i++){
-      fgets(s,maxlib,fp);
+      fgets(s,MAXLIB,fp);
       nwords = 0;
       words[nwords++] = strtok(s," \t\n\r\f");
       while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -405,7 +401,7 @@ void PairComb3::read_lib()
       for (i=0; i<maxx+1; i++)
         for (j=0; j<maxy+1; j++)
           for (k=0; k<maxz+1; k++) {
-            fgets(s,maxlib,fp);
+            fgets(s,MAXLIB,fp);
             nwords = 0;
             words[nwords++] = strtok(s," \t\n\r\f");
             while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -423,7 +419,7 @@ void PairComb3::read_lib()
       for (i=0; i<maxx; i++)
         for (j=0; j<maxy; j++)
           for (k=0; k<maxz; k++) {
-            fgets(s,maxlib,fp);
+            fgets(s,MAXLIB,fp);
             nwords = 0;
             words[nwords++] = strtok(s," \t\n\r\f");
             while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -432,7 +428,7 @@ void PairComb3::read_lib()
            jj = atoi(words[2]);
            kk = atoi(words[3]);
            for(iii=0; iii<2; iii++) {
-             fgets(s,maxlib,fp);
+             fgets(s,MAXLIB,fp);
              nwords = 0;
              words[nwords++] = strtok(s," \t\n\r\f");
              while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -447,7 +443,7 @@ void PairComb3::read_lib()
       for (i=0; i<maxxc+1; i++)
         for (j=0; j<maxyc+1; j++)
           for (k=0; k<maxconj; k++) {
-            fgets(s,maxlib,fp);
+            fgets(s,MAXLIB,fp);
             nwords = 0;
             words[nwords++] = strtok(s," \t\n\r\f");
             while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -465,7 +461,7 @@ void PairComb3::read_lib()
       for (i=0; i<maxxc; i++)
         for (j=0; j<maxyc; j++)
           for (k=0; k<maxconj-1; k++) {
-            fgets(s,maxlib,fp);
+            fgets(s,MAXLIB,fp);
             nwords = 0;
             words[nwords++] = strtok(s," \t\n\r\f");
             while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -474,7 +470,7 @@ void PairComb3::read_lib()
             jj = atoi(words[2]);
             kk = atoi(words[3])-1;
             for (iii=0; iii<2; iii++) {
-              fgets(s,maxlib,fp);
+              fgets(s,MAXLIB,fp);
               nwords = 0;
               words[nwords++] = strtok(s," \t\n\r\f");
               while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -489,7 +485,7 @@ void PairComb3::read_lib()
       for (i=0; i<maxxc+1; i++)
         for (j=0; j<maxyc+1; j++)
           for (k=0; k<maxconj; k++) {
-            fgets(s,maxlib,fp);
+            fgets(s,MAXLIB,fp);
             nwords = 0;
             words[nwords++] = strtok(s," \t\n\r\f");
             while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -507,7 +503,7 @@ void PairComb3::read_lib()
       for (i=0; i<maxxc; i++)
         for (j=0; j<maxyc; j++)
           for (k=0; k<maxconj-1; k++) {
-            fgets(s,maxlib,fp);
+            fgets(s,MAXLIB,fp);
             nwords = 0;
             words[nwords++] = strtok(s," \t\n\r\f");
             while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -516,7 +512,7 @@ void PairComb3::read_lib()
             jj = atoi(words[2]);
             kk = atoi(words[3])-1;
             for(iii=0; iii<2; iii++) {
-              fgets(s,maxlib,fp);
+              fgets(s,MAXLIB,fp);
               nwords = 0;
               words[nwords++] = strtok(s," \t\n\r\f");
               while ((words[nwords++] = strtok(NULL," \t\n\r\f")))continue;
@@ -607,7 +603,7 @@ void PairComb3::read_file(char *file)
     fp = force->open_potential(file);
     if (fp == NULL) {
       char str[128];
-      sprintf(str,"Cannot open COMB3 potential file %s",file);
+      snprintf(str,128,"Cannot open COMB3 potential file %s",file);
       error->one(FLERR,str);
     }
   }
@@ -1569,7 +1565,7 @@ void PairComb3::compute(int eflag, int vflag)
 /* ---------------------------------------------------------------------- */
 
 void PairComb3::repulsive(Param *parami, Param *paramj, double rsq,
-        double &fforce,int eflag, double &eng, double iq, double jq)
+        double &fforce,int /*eflag*/, double &eng, double iq, double jq)
 {
   double r,tmp_fc,tmp_fc_d,Di,Dj;
   double caj,vrcs,fvrcs;
@@ -1614,7 +1610,7 @@ void PairComb3::repulsive(Param *parami, Param *paramj, double rsq,
 /* ---------------------------------------------------------------------- */
 
 double PairComb3::zeta(Param *parami, Param *paramj, double rsqij,
-        double rsqik, double *delrij, double *delrik, int i, double xcn)
+        double rsqik, double *delrij, double *delrik, int /*i*/, double xcn)
 {
   double rij,rik,costheta,arg,ex_delr,rlm3;
 
@@ -1661,7 +1657,7 @@ void PairComb3::selfp6p(Param *parami, Param *paramj, double rsq,
 /* ---------------------------------------------------------------------- */
 
 double PairComb3::ep6p(Param *paramj, Param *paramk, double rsqij, double rsqik,
-                     double *delrij, double *delrik , double &zet_add)
+                     double *delrij, double *delrik , double &/*zet_add*/)
 {
   double comtt;
   double pplp0 = paramj->p6p0;
@@ -2109,7 +2105,7 @@ void PairComb3::coord(Param *param, double r, int i,
 
 void PairComb3::cntri_int(int tri_flag, double xval, double yval,
                 double zval, int ixmin, int iymin, int izmin, double &vval,
-                double &dvalx, double &dvaly, double &dvalz, Param *param)
+                double &dvalx, double &dvaly, double &dvalz, Param * /*param*/)
 {
   double x;
   vval = 0.0; dvalx = 0.0; dvaly = 0.0; dvalz = 0.0;
@@ -2254,7 +2250,7 @@ void PairComb3::comb_gijk_d(double costheta, Param *param, double nco_tmp,
 void PairComb3::attractive(Param *parami, Param *paramj , Param *paramk, double prefac_ij1,
         double prefac_ij2, double prefac_ij3, double prefac_ij4,
         double prefac_ij5, double rsqij, double rsqik, double *delrij,
-        double *delrik, double *fi, double *fj,double *fk, int i, double xcn)
+        double *delrik, double *fi, double *fj,double *fk, int /*i*/, double xcn)
 {
   double rij_hat[3],rik_hat[3];
   double rij,rijinv,rik,rikinv;
@@ -2867,7 +2863,7 @@ void PairComb3::field(Param *parami, Param *paramj, double rsq, double iq,
 
 /* ---------------------------------------------------------------------- */
 
-double PairComb3::rad_init(double rsq2,Param *param,int i,
+double PairComb3::rad_init(double rsq2,Param *param,int /*i*/,
                 double &radtot, double cnconj)
 {
   double r, fc1k, radcut;
@@ -2882,7 +2878,7 @@ double PairComb3::rad_init(double rsq2,Param *param,int i,
 /* ---------------------------------------------------------------------- */
 
 void PairComb3::rad_calc(double r, Param *parami, Param *paramj,
-        double kconjug, double lconjug, int i, int j, double xcn, double ycn)
+        double kconjug, double lconjug, int /*i*/, int /*j*/, double xcn, double ycn)
 {
   int ixmin, iymin, izmin;
   int radindx;
@@ -3061,7 +3057,7 @@ double PairComb3::bbtor1(int torindx, Param *paramk, Param *paraml,
 /* ---------------------------------------------------------------------- */
 
 void PairComb3::tor_calc(double r, Param *parami, Param *paramj,
-        double kconjug, double lconjug, int i, int j, double xcn, double ycn)
+        double kconjug, double lconjug, int /*i*/, int /*j*/, double xcn, double ycn)
 {
   int ixmin, iymin, izmin;
   double vtor, dtorx, dtory, dtorz;
@@ -3589,7 +3585,7 @@ void PairComb3::qfo_dipole(double fac11, int mr1, int mr2, int mr3,
 
 void PairComb3::qfo_short(Param *parami, Param *paramj, double rsq,
         double iq, double jq, double &fqij, double &fqji,
-        int i, int j, int nj)
+        int i, int /*j*/, int nj)
 {
   double r, tmp_fc;
   double Di, Dj, dDi, dDj, Bsi, Bsj, dBsi, dBsj;
@@ -3863,7 +3859,7 @@ double PairComb3::switching_d(double rr)
 /* ---------------------------------------------------------------------- */
 
 int PairComb3::pack_forward_comm(int n, int *list, double *buf,
-                                 int pbc_flag, int *pbc)
+                                 int /*pbc_flag*/, int * /*pbc*/)
 {
   int i,j,m;
 

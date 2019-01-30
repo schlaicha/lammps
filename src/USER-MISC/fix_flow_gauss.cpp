@@ -16,8 +16,8 @@
    Joel.Eaves@Colorado.edu
 ------------------------------------------------------------------------- */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include "fix_flow_gauss.h"
 #include "atom.h"
 #include "force.h"
@@ -155,7 +155,7 @@ void FixFlowGauss::setup(int vflag)
 /* ----------------------------------------------------------------------
    this is where Gaussian dynamics constraint is applied
    ------------------------------------------------------------------------- */
-void FixFlowGauss::post_force(int vflag)
+void FixFlowGauss::post_force(int /*vflag*/)
 {
   double **f   = atom->f;
   double **v   = atom->v;
@@ -222,7 +222,7 @@ void FixFlowGauss::post_force(int vflag)
 
 }
 
-void FixFlowGauss::post_force_respa(int vflag, int ilevel, int iloop)
+void FixFlowGauss::post_force_respa(int vflag, int ilevel, int /*iloop*/)
 {
   if (ilevel == ilevel_respa) post_force(vflag);
 }

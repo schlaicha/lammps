@@ -22,12 +22,12 @@
  See the README file in the top-level LAMMPS directory.
  ------------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <cstdlib>
+#include <Eigen/Eigen>
 #include "fix_smd_move_triangulated_surface.h"
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
 #include "atom.h"
 #include "comm.h"
 #include "force.h"
@@ -41,7 +41,6 @@
 #include "error.h"
 #include "pair.h"
 #include "domain.h"
-#include <Eigen/Eigen>
 #include "math_const.h"
 
 using namespace Eigen;
@@ -201,7 +200,7 @@ FixSMDMoveTriSurf::FixSMDMoveTriSurf(LAMMPS *lmp, int narg, char **arg) :
 
                 } else {
                         char msg[128];
-                        sprintf(msg, "Illegal keyword for fix smd/move_tri_surf: %s\n", arg[iarg]);
+                        snprintf(msg,128, "Illegal keyword for fix smd/move_tri_surf: %s\n", arg[iarg]);
                         error->all(FLERR, msg);
                 }
 
@@ -249,7 +248,7 @@ void FixSMDMoveTriSurf::init() {
 /* ----------------------------------------------------------------------
  ------------------------------------------------------------------------- */
 
-void FixSMDMoveTriSurf::initial_integrate(int vflag) {
+void FixSMDMoveTriSurf::initial_integrate(int /*vflag*/) {
         double **x = atom->x;
         double **x0 = atom->x0;
         double **v = atom->v;
@@ -462,7 +461,7 @@ void FixSMDMoveTriSurf::reset_dt() {
 
 /* ---------------------------------------------------------------------- */
 
-int FixSMDMoveTriSurf::pack_forward_comm(int n, int *list, double *buf, int pbc_flag, int *pbc) {
+int FixSMDMoveTriSurf::pack_forward_comm(int n, int *list, double *buf, int /*pbc_flag*/, int * /*pbc*/) {
         int i, j, m;
         double **x0 = atom->x0;
         double **smd_data_9 = atom->smd_data_9;

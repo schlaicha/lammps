@@ -12,8 +12,8 @@
 ------------------------------------------------------------------------- */
 
 #include <mpi.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include "dump_local.h"
 #include "atom.h"
 #include "modify.h"
@@ -326,7 +326,7 @@ int DumpLocal::count()
 
 /* ---------------------------------------------------------------------- */
 
-void DumpLocal::pack(tagint *dummy)
+void DumpLocal::pack(tagint * /*dummy*/)
 {
   for (int n = 0; n < size_one; n++) (this->*pack_choice[n])(n);
 }

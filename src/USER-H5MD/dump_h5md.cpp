@@ -15,11 +15,11 @@
    Contributing author: Pierre de Buyl (KU Leuven)
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <climits>
 #include "ch5md.h"
 #include "dump_h5md.h"
 #include "domain.h"
@@ -346,7 +346,7 @@ void DumpH5MD::openfile()
 
 /* ---------------------------------------------------------------------- */
 
-void DumpH5MD::write_header(bigint nbig)
+void DumpH5MD::write_header(bigint /* nbig */)
 {
   return;
 }

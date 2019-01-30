@@ -8,7 +8,7 @@
 // Colvars repository at GitHub.
 
 #include <sstream>
-#include <string.h>
+#include <cstring>
 
 #include "colvarmodule.h"
 #include "colvarparse.h"
@@ -30,10 +30,10 @@ colvarmodule::colvarmodule(colvarproxy *proxy_in)
   depth_s = 0;
   cv_traj_os = NULL;
 
-  // pointer to the proxy object
   if (proxy == NULL) {
-    proxy = proxy_in;
-    parse = new colvarparse();
+    proxy = proxy_in; // Pointer to the proxy object
+    parse = new colvarparse(); // Parsing object for global options
+    version_int = proxy->get_version_from_string(COLVARS_VERSION);
   } else {
     // TODO relax this error to handle multiple molecules in VMD
     // once the module is not static anymore
@@ -58,22 +58,22 @@ colvarmodule::colvarmodule(colvarproxy *proxy_in)
   // "it_restart" will be set by the input state file, if any;
   // "it" should be updated by the proxy
   colvarmodule::it = colvarmodule::it_restart = 0;
-  colvarmodule::it_restart_from_state_file = true;
 
-  colvarmodule::use_scripted_forces = false;
-
-  colvarmodule::b_analysis = false;
+  use_scripted_forces = false;
+  scripting_after_biases = false;
 
   colvarmodule::debug_gradients_step_size = 1.0e-07;
 
   colvarmodule::rotation::monitor_crossings = false;
   colvarmodule::rotation::crossing_threshold = 1.0e-02;
 
-  colvarmodule::cv_traj_freq = 100;
-  colvarmodule::restart_out_freq = proxy->restart_frequency();
+  cv_traj_freq = 100;
+  restart_out_freq = proxy->restart_frequency();
 
   // by default overwrite the existing trajectory file
-  colvarmodule::cv_traj_append = false;
+  cv_traj_append = false;
+
+  cv_traj_write_labels = true;
 }
 
 
@@ -137,7 +137,7 @@ int colvarmodule::read_config_file(char const  *config_filename)
   // read the config file into a string
   std::string conf = "";
   std::string line;
-  while (colvarparse::getline_nocomments(config_s, line)) {
+  while (parse->read_config_line(config_s, line)) {
     // Delete lines that contain only white space after removing comments
     if (line.find_first_not_of(colvarparse::white_space) != std::string::npos)
       conf.append(line+"\n");
@@ -157,11 +157,12 @@ int colvarmodule::read_config_string(std::string const &config_str)
   // strip the comments away
   std::string conf = "";
   std::string line;
-  while (colvarparse::getline_nocomments(config_s, line)) {
+  while (parse->read_config_line(config_s, line)) {
     // Delete lines that contain only white space after removing comments
     if (line.find_first_not_of(colvarparse::white_space) != std::string::npos)
       conf.append(line+"\n");
   }
+
   return parse_config(conf);
 }
 
@@ -189,26 +190,33 @@ int colvarmodule::parse_config(std::string &conf)
 {
   extra_conf.clear();
 
-  // parse global options
+  // Check that the input has matching braces
+  if (colvarparse::check_braces(conf, 0) != COLVARS_OK) {
+    return cvm::error("Error: unmatched curly braces in configuration.\n",
+                      INPUT_ERROR);
+  }
+
+  // Parse global options
   if (catch_input_errors(parse_global_params(conf))) {
     return get_error();
   }
 
-  // parse the options for collective variables
+  // Parse the options for collective variables
   if (catch_input_errors(parse_colvars(conf))) {
     return get_error();
   }
 
-  // parse the options for biases
+  // Parse the options for biases
   if (catch_input_errors(parse_biases(conf))) {
     return get_error();
   }
 
-  // done parsing known keywords, check that all keywords found were valid ones
+  // Done parsing known keywords, check that all keywords found were valid ones
   if (catch_input_errors(parse->check_keywords(conf, "colvarmodule"))) {
     return get_error();
   }
 
+  // Parse auto-generated configuration (e.g. for back-compatibility)
   if (extra_conf.size()) {
     catch_input_errors(parse_global_params(extra_conf));
     catch_input_errors(parse_colvars(extra_conf));
@@ -222,15 +230,19 @@ int colvarmodule::parse_config(std::string &conf)
   cvm::log("Collective variables module (re)initialized.\n");
   cvm::log(cvm::line_marker);
 
-  // update any necessary proxy data
+  // Update any necessary proxy data
   proxy->setup();
 
-  if (cv_traj_os != NULL) {
-    // configuration might have changed, better redo the labels
-    write_traj_label(*cv_traj_os);
-  }
+  // configuration might have changed, better redo the labels
+  cv_traj_write_labels = true;
 
   return get_error();
+}
+
+
+std::string const & colvarmodule::get_config() const
+{
+  return parse->get_config();
 }
 
 
@@ -245,9 +257,13 @@ int colvarmodule::parse_global_params(std::string const &conf)
 {
   colvarmodule *cvm = cvm::main();
 
-  std::string index_file_name;
-  if (parse->get_keyval(conf, "indexFile", index_file_name)) {
-    cvm->read_index_file(index_file_name.c_str());
+  {
+    std::string index_file_name;
+    size_t pos = 0;
+    while (parse->key_lookup(conf, "indexFile", &index_file_name, &pos)) {
+      cvm->read_index_file(index_file_name.c_str());
+      index_file_name.clear();
+    }
   }
 
   if (parse->get_keyval(conf, "smp", proxy->b_smp_active, proxy->b_smp_active)) {
@@ -256,7 +272,12 @@ int colvarmodule::parse_global_params(std::string const &conf)
     }
   }
 
-  parse->get_keyval(conf, "analysis", b_analysis, b_analysis);
+  bool b_analysis = true;
+  if (parse->get_keyval(conf, "analysis", b_analysis, true,
+                        colvarparse::parse_silent)) {
+    cvm::log("Warning: keyword \"analysis\" is deprecated: it is now set "
+             "to true; individual analyses are performed only if requested.");
+  }
 
   parse->get_keyval(conf, "debugGradientsStepSize", debug_gradients_step_size,
                     debug_gradients_step_size,
@@ -279,15 +300,18 @@ int colvarmodule::parse_global_params(std::string const &conf)
   parse->get_keyval(conf, "colvarsTrajAppend",
                     cv_traj_append, cv_traj_append, colvarparse::parse_silent);
 
-  parse->get_keyval(conf, "scriptedColvarForces", use_scripted_forces, false);
+  parse->get_keyval(conf, "scriptedColvarForces",
+                    use_scripted_forces, use_scripted_forces);
 
-  parse->get_keyval(conf, "scriptingAfterBiases", scripting_after_biases, true);
+  parse->get_keyval(conf, "scriptingAfterBiases",
+                    scripting_after_biases, scripting_after_biases);
 
   if (use_scripted_forces && !proxy->force_script_defined) {
-    cvm::error("User script for scripted colvar forces not found.", INPUT_ERROR);
+    return cvm::error("User script for scripted colvar forces not found.",
+                      INPUT_ERROR);
   }
 
-  return (cvm::get_error() ? COLVARS_ERROR : COLVARS_OK);
+  return cvm::get_error();
 }
 
 
@@ -432,13 +456,13 @@ int colvarmodule::parse_biases(std::string const &conf)
 }
 
 
-int colvarmodule::num_variables() const
+size_t colvarmodule::num_variables() const
 {
   return colvars.size();
 }
 
 
-int colvarmodule::num_variables_feature(int feature_id) const
+size_t colvarmodule::num_variables_feature(int feature_id) const
 {
   size_t n = 0;
   for (std::vector<colvar *>::const_iterator cvi = colvars.begin();
@@ -452,13 +476,13 @@ int colvarmodule::num_variables_feature(int feature_id) const
 }
 
 
-int colvarmodule::num_biases() const
+size_t colvarmodule::num_biases() const
 {
   return biases.size();
 }
 
 
-int colvarmodule::num_biases_feature(int feature_id) const
+size_t colvarmodule::num_biases_feature(int feature_id) const
 {
   size_t n = 0;
   for (std::vector<colvarbias *>::const_iterator bi = biases.begin();
@@ -472,7 +496,7 @@ int colvarmodule::num_biases_feature(int feature_id) const
 }
 
 
-int colvarmodule::num_biases_type(std::string const &type) const
+size_t colvarmodule::num_biases_type(std::string const &type) const
 {
   size_t n = 0;
   for (std::vector<colvarbias *>::const_iterator bi = biases.begin();
@@ -694,9 +718,7 @@ int colvarmodule::calc()
   error_code |= calc_biases();
   error_code |= update_colvar_forces();
 
-  if (cvm::b_analysis) {
-    error_code |= analyze();
-  }
+  error_code |= analyze();
 
   // write trajectory files, if needed
   if (cv_traj_freq && cv_traj_name.size()) {
@@ -714,6 +736,8 @@ int colvarmodule::calc()
     }
     write_output_files();
   }
+
+  error_code |= end_of_step();
 
   return error_code;
 }
@@ -971,13 +995,20 @@ int colvarmodule::write_restart_file(std::string const &out_name)
 int colvarmodule::write_traj_files()
 {
   if (cv_traj_os == NULL) {
-    open_traj_file(cv_traj_name);
+    if (open_traj_file(cv_traj_name) != COLVARS_OK) {
+      return cvm::get_error();
+    } else {
+      cv_traj_write_labels = true;
+    }
   }
 
   // write labels in the traj file every 1000 lines and at first timestep
-  if ((cvm::step_absolute() % (cv_traj_freq * 1000)) == 0 || cvm::step_relative() == 0) {
+  if ((cvm::step_absolute() % (cv_traj_freq * 1000)) == 0 ||
+      cvm::step_relative() == 0 ||
+      cv_traj_write_labels) {
     write_traj_label(*cv_traj_os);
   }
+  cv_traj_write_labels = false;
 
   if ((cvm::step_absolute() % cv_traj_freq) == 0) {
     write_traj(*cv_traj_os);
@@ -1028,6 +1059,33 @@ int colvarmodule::analyze()
 }
 
 
+int colvarmodule::end_of_step()
+{
+  if (cvm::debug()) {
+    cvm::log("colvarmodule::end_of_step(), step = "+cvm::to_str(it)+".\n");
+  }
+
+  for (std::vector<colvar *>::iterator cvi = variables_active()->begin();
+       cvi != variables_active()->end();
+       cvi++) {
+    cvm::increase_depth();
+    (*cvi)->end_of_step();
+    cvm::decrease_depth();
+  }
+
+  // perform bias-specific analysis
+  for (std::vector<colvarbias *>::iterator bi = biases.begin();
+       bi != biases.end();
+       bi++) {
+    cvm::increase_depth();
+    (*bi)->end_of_step();
+    cvm::decrease_depth();
+  }
+
+  return (cvm::get_error() ? COLVARS_ERROR : COLVARS_OK);
+}
+
+
 int colvarmodule::setup()
 {
   if (this->size() == 0) return cvm::get_error();
@@ -1062,9 +1120,9 @@ colvarmodule::~colvarmodule()
 
 int colvarmodule::reset()
 {
-  parse->init();
+  cvm::log("Resetting the Collective Variables module.\n");
 
-  cvm::log("Resetting the Collective Variables Module.\n");
+  parse->init();
 
   // Iterate backwards because we are deleting the elements as we go
   for (std::vector<colvarbias *>::reverse_iterator bi = biases.rbegin();
@@ -1073,6 +1131,7 @@ int colvarmodule::reset()
     delete *bi; // the bias destructor updates the biases array
   }
   biases.clear();
+  biases_active_.clear();
 
   // Iterate backwards because we are deleting the elements as we go
   for (std::vector<colvar *>::reverse_iterator cvi = colvars.rbegin();
@@ -1088,7 +1147,7 @@ int colvarmodule::reset()
   proxy->reset();
 
   if (cv_traj_os != NULL) {
-    // Do not close file here, as we might not be done with it yet.
+    // Do not close traj file here, as we might not be done with it yet.
     proxy->flush_output_stream(cv_traj_os);
   }
 
@@ -1188,12 +1247,10 @@ std::istream & colvarmodule::read_restart(std::istream &is)
     // read global restart information
     std::string restart_conf;
     if (is >> colvarparse::read_block("configuration", restart_conf)) {
-      if (it_restart_from_state_file) {
-        parse->get_keyval(restart_conf, "step",
-                          it_restart, (size_t) 0,
-                          colvarparse::parse_silent);
+      parse->get_keyval(restart_conf, "step",
+                        it_restart, (size_t) 0,
+                        colvarparse::parse_silent);
         it = it_restart;
-      }
       std::string restart_version;
       parse->get_keyval(restart_conf, "version",
                         restart_version, std::string(""),
@@ -1688,40 +1745,59 @@ int cvm::read_index_file(char const *filename)
   return (cvm::get_error() ? COLVARS_ERROR : COLVARS_OK);
 }
 
+
 int cvm::load_atoms(char const *file_name,
                     cvm::atom_group &atoms,
                     std::string const &pdb_field,
-                    double const pdb_field_value)
+                    double pdb_field_value)
 {
   return proxy->load_atoms(file_name, atoms, pdb_field, pdb_field_value);
 }
 
-int cvm::load_coords(char const *file_name,
-                     std::vector<cvm::atom_pos> &pos,
-                     const std::vector<int> &indices,
-                     std::string const &pdb_field,
-                     double const pdb_field_value)
-{
-  // Differentiate between PDB and XYZ files
-  // for XYZ files, use CVM internal parser
-  // otherwise call proxy function for PDB
 
-  std::string const ext(strlen(file_name) > 4 ? (file_name + (strlen(file_name) - 4)) : file_name);
+int cvm::load_coords(char const *file_name,
+                     std::vector<cvm::rvector> *pos,
+                     cvm::atom_group *atoms,
+                     std::string const &pdb_field,
+                     double pdb_field_value)
+{
+  int error_code = COLVARS_OK;
+
+  std::string const ext(strlen(file_name) > 4 ?
+                        (file_name + (strlen(file_name) - 4)) :
+                        file_name);
+
+  atoms->create_sorted_ids();
+
+  std::vector<cvm::rvector> sorted_pos(atoms->size(), cvm::rvector(0.0));
+
+  // Differentiate between PDB and XYZ files
   if (colvarparse::to_lower_cppstr(ext) == std::string(".xyz")) {
-    if ( pdb_field.size() > 0 ) {
-      cvm::error("Error: PDB column may not be specified for XYZ coordinate file.\n", INPUT_ERROR);
-      return COLVARS_ERROR;
+    if (pdb_field.size() > 0) {
+      return cvm::error("Error: PDB column may not be specified "
+                        "for XYZ coordinate files.\n", INPUT_ERROR);
     }
-    return cvm::load_coords_xyz(file_name, pos, indices);
+    // For XYZ files, use internal parser
+    error_code |= cvm::load_coords_xyz(file_name, &sorted_pos, atoms);
   } else {
-    return proxy->load_coords(file_name, pos, indices, pdb_field, pdb_field_value);
+    // Otherwise, call proxy function for PDB
+    error_code |= proxy->load_coords(file_name,
+                                     sorted_pos, atoms->sorted_ids(),
+                                     pdb_field, pdb_field_value);
   }
+
+  std::vector<int> const &map = atoms->sorted_ids_map();
+  for (size_t i = 0; i < atoms->size(); i++) {
+    (*pos)[map[i]] = sorted_pos[i];
+  }
+
+  return error_code;
 }
 
 
 int cvm::load_coords_xyz(char const *filename,
-                         std::vector<atom_pos> &pos,
-                         const std::vector<int> &indices)
+                         std::vector<rvector> *pos,
+                         cvm::atom_group *atoms)
 {
   std::ifstream xyz_is(filename);
   unsigned int natoms;
@@ -1736,12 +1812,12 @@ int cvm::load_coords_xyz(char const *filename,
   cvm::getline(xyz_is, line);
   cvm::getline(xyz_is, line);
   xyz_is.width(255);
-  std::vector<atom_pos>::iterator pos_i = pos.begin();
+  std::vector<atom_pos>::iterator pos_i = pos->begin();
 
-  if (pos.size() != natoms) { // Use specified indices
+  if (pos->size() != natoms) { // Use specified indices
     int next = 0; // indices are zero-based
-    std::vector<int>::const_iterator index = indices.begin();
-    for ( ; pos_i != pos.end() ; pos_i++, index++) {
+    std::vector<int>::const_iterator index = atoms->sorted_ids().begin();
+    for ( ; pos_i != pos->end() ; pos_i++, index++) {
 
       while ( next < *index ) {
         cvm::getline(xyz_is, line);
@@ -1751,7 +1827,7 @@ int cvm::load_coords_xyz(char const *filename,
       xyz_is >> (*pos_i)[0] >> (*pos_i)[1] >> (*pos_i)[2];
     }
   } else {          // Use all positions
-    for ( ; pos_i != pos.end() ; pos_i++) {
+    for ( ; pos_i != pos->end() ; pos_i++) {
       xyz_is >> symbol;
       xyz_is >> (*pos_i)[0] >> (*pos_i)[1] >> (*pos_i)[2];
     }
@@ -1792,17 +1868,13 @@ void cvm::request_total_force()
   proxy->request_total_force(true);
 }
 
-cvm::rvector cvm::position_distance(atom_pos const &pos1,
-                                            atom_pos const &pos2)
+
+cvm::rvector cvm::position_distance(cvm::atom_pos const &pos1,
+                                    cvm::atom_pos const &pos2)
 {
   return proxy->position_distance(pos1, pos2);
 }
 
-cvm::real cvm::position_dist2(cvm::atom_pos const &pos1,
-                                      cvm::atom_pos const &pos2)
-{
-  return proxy->position_dist2(pos1, pos2);
-}
 
 cvm::real cvm::rand_gaussian(void)
 {
@@ -1853,7 +1925,6 @@ long      colvarmodule::it = 0;
 long      colvarmodule::it_restart = 0;
 size_t    colvarmodule::restart_out_freq = 0;
 size_t    colvarmodule::cv_traj_freq = 0;
-bool      colvarmodule::b_analysis = false;
 bool      colvarmodule::use_scripted_forces = false;
 bool      colvarmodule::scripting_after_biases = true;
 

@@ -17,10 +17,10 @@
             Maurice de Koning (Unicamp/Brazil) - dekoning@ifi.unicamp.br
  ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "pair_ufm.h"
 #include "atom.h"
 #include "comm.h"
@@ -353,8 +353,8 @@ void PairUFM::write_data_all(FILE *fp)
 
 /* ---------------------------------------------------------------------- */
 
-double PairUFM::single(int i, int j, int itype, int jtype, double rsq,
-                         double factor_coul, double factor_lj,
+double PairUFM::single(int /*i*/, int /*j*/, int itype, int jtype, double rsq,
+                         double /*factor_coul*/, double factor_lj,
                          double &fforce)
 {
   double expuf,phiuf;

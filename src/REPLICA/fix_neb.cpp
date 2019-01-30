@@ -17,9 +17,9 @@
 ------------------------------------------------------------------------- */
 
 #include <mpi.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include "fix_neb.h"
 #include "universe.h"
 #include "update.h"
@@ -270,7 +270,7 @@ void FixNEB::min_setup(int vflag)
 
 /* ---------------------------------------------------------------------- */
 
-void FixNEB::min_post_force(int vflag)
+void FixNEB::min_post_force(int /*vflag*/)
 {
   double vprev,vnext;
   double delxp,delyp,delzp,delxn,delyn,delzn;

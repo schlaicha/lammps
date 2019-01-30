@@ -16,11 +16,11 @@
 ------------------------------------------------------------------------- */
 
 #include "sna.h"
-#include <math.h>
+#include <cmath>
 #include "math_const.h"
 #include "math_extra.h"
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include "openmp_snap.h"
 
 #include "memory.h"
@@ -1231,7 +1231,7 @@ void SNA::compute_uarray(double x, double y, double z,
 }
 
 void SNA::compute_uarray_omp(double x, double y, double z,
-                             double z0, double r, int sub_threads)
+                             double z0, double r, int /*sub_threads*/)
 {
   double r0inv;
   double a_r, b_r, a_i, b_i;

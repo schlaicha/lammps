@@ -11,10 +11,10 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
 #include "dump_image.h"
 #include "image.h"
 #include "atom.h"
@@ -1193,7 +1193,7 @@ void DumpImage::create_image()
 /* ---------------------------------------------------------------------- */
 
 int DumpImage::pack_forward_comm(int n, int *list, double *buf,
-                                 int pbc_flag, int *pbc)
+                                 int /*pbc_flag*/, int * /*pbc*/)
 {
   int i,j,m;
 
@@ -1290,7 +1290,7 @@ int DumpImage::modify_param(int narg, char **arg)
   if (strcmp(arg[0],"amap") == 0) {
     if (narg < 6) error->all(FLERR,"Illegal dump_modify command");
     if (strlen(arg[3]) != 2) error->all(FLERR,"Illegal dump_modify command");
-    int factor;
+    int factor = 0;
     if (arg[3][0] == 's') factor = 1;
     else if (arg[3][0] == 'c') factor = 2;
     else if (arg[3][0] == 'd') factor = 3;

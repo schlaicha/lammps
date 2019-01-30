@@ -15,8 +15,8 @@
    Contributing author: Axel Kohlmeyer (Temple U)
 ------------------------------------------------------------------------- */
 
-#include <string.h>
-#include <math.h>
+#include <cstring>
+#include <cmath>
 #include "compute_aggregate_atom.h"
 #include "atom.h"
 #include "atom_vec.h"
@@ -98,7 +98,7 @@ void ComputeAggregateAtom::init()
 
 /* ---------------------------------------------------------------------- */
 
-void ComputeAggregateAtom::init_list(int id, NeighList *ptr)
+void ComputeAggregateAtom::init_list(int /*id*/, NeighList *ptr)
 {
   list = ptr;
 }
@@ -231,7 +231,7 @@ void ComputeAggregateAtom::compute_peratom()
 /* ---------------------------------------------------------------------- */
 
 int ComputeAggregateAtom::pack_forward_comm(int n, int *list, double *buf,
-                                          int pbc_flag, int *pbc)
+                                          int /*pbc_flag*/, int * /*pbc*/)
 {
   int i,j,m;
 

@@ -25,8 +25,8 @@
    -reaction problems". The Journal of Chemical Physics, 2015, 143: 014101.
 ------------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "fix_mvv_tdpd.h"
 #include "atom.h"
 #include "force.h"
@@ -76,7 +76,7 @@ void FixMvvTDPD::init()
    allow for both per-type and per-atom mass
 ------------------------------------------------------------------------- */
 
-void FixMvvTDPD::initial_integrate(int vflag)
+void FixMvvTDPD::initial_integrate(int /*vflag*/)
 {
   double dtfm;
   // update v and x and cc of atoms in group

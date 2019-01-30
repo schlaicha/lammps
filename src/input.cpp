@@ -12,11 +12,11 @@
 ------------------------------------------------------------------------- */
 
 #include <mpi.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <errno.h>
-#include <ctype.h>
+#include <cctype>
 #include <unistd.h>
 #include <sys/stat.h>
 #include "input.h"
@@ -267,7 +267,7 @@ void Input::file(const char *filename)
     infile = fopen(filename,"r");
     if (infile == NULL) {
       char str[128];
-      sprintf(str,"Cannot open input script %s",filename);
+      snprintf(str,128,"Cannot open input script %s",filename);
       error->one(FLERR,str);
     }
     infiles[0] = infile;
@@ -429,14 +429,14 @@ char *Input::nextword(char *str, char **next)
     start += 3;
     *next = stop+3;
     if (**next && !isspace(**next))
-      error->all(FLERR,"Input line quote not followed by whitespace");
+      error->all(FLERR,"Input line quote not followed by white-space");
   } else if (*start == '"' || *start == '\'') {
     stop = strchr(&start[1],*start);
     if (!stop) error->all(FLERR,"Unbalanced quotes in input line");
     start++;
     *next = stop+1;
     if (**next && !isspace(**next))
-      error->all(FLERR,"Input line quote not followed by whitespace");
+      error->all(FLERR,"Input line quote not followed by white-space");
   } else {
     stop = &start[strcspn(start," \t\n\v\f\r")];
     if (*stop == '\0') *next = stop;
@@ -497,7 +497,7 @@ void Input::substitute(char *&str, char *&str2, int &max, int &max2, int flag)
         beyond = ptr + strlen(var) + 3;
         value = variable->retrieve(var);
 
-      // immediate variable between parenthesis, e.g. $(1/2)
+      // immediate variable between parenthesis, e.g. $(1/3) or $(1/3:%.6g)
 
       } else if (*(ptr+1) == '(') {
         var = ptr+2;
@@ -516,10 +516,20 @@ void Input::substitute(char *&str, char *&str2, int &max, int &max2, int flag)
         if (var[i] == '\0') error->one(FLERR,"Invalid immediate variable");
         var[i] = '\0';
         beyond = ptr + strlen(var) + 3;
-        sprintf(immediate,"%.20g",variable->compute_equal(var));
+
+        // check if an inline format specifier was appended with a colon
+
+        char fmtstr[64] = "%.20g";
+        char *fmtflag;
+        if ((fmtflag=strrchr(var, ':')) && (fmtflag[1]=='%')) {
+          strncpy(fmtstr,&fmtflag[1],sizeof(fmtstr)-1);
+          *fmtflag='\0';
+        }
+
+        snprintf(immediate,256,fmtstr,variable->compute_equal(var));
         value = immediate;
 
-        // single character variable name, e.g. $a
+      // single character variable name, e.g. $a
 
       } else {
         var = ptr;
@@ -531,7 +541,7 @@ void Input::substitute(char *&str, char *&str2, int &max, int &max2, int flag)
 
       if (value == NULL) {
         char str[128];
-        sprintf(str,"Substitution for illegal variable %s",var);
+        snprintf(str,128,"Substitution for illegal variable %s",var);
         error->one(FLERR,str);
       }
       // check if storage in str2 needs to be expanded
@@ -1037,7 +1047,7 @@ void Input::include()
     infile = fopen(arg[0],"r");
     if (infile == NULL) {
       char str[128];
-      sprintf(str,"Cannot open input script %s",arg[0]);
+      snprintf(str,128,"Cannot open input script %s",arg[0]);
       error->one(FLERR,str);
     }
     infiles[nfile++] = infile;
@@ -1062,7 +1072,7 @@ void Input::jump()
       infile = fopen(arg[0],"r");
       if (infile == NULL) {
         char str[128];
-        sprintf(str,"Cannot open input script %s",arg[0]);
+        snprintf(str,128,"Cannot open input script %s",arg[0]);
         error->one(FLERR,str);
       }
       infiles[nfile-1] = infile;
@@ -1107,7 +1117,7 @@ void Input::log()
 
       if (logfile == NULL) {
         char str[128];
-        sprintf(str,"Cannot open logfile %s",arg[0]);
+        snprintf(str,128,"Cannot open logfile %s",arg[0]);
         error->one(FLERR,str);
       }
     }
@@ -1128,7 +1138,7 @@ void Input::partition()
 {
   if (narg < 3) error->all(FLERR,"Illegal partition command");
 
-  int yesflag;
+  int yesflag = 0;
   if (strcmp(arg[0],"yes") == 0) yesflag = 1;
   else if (strcmp(arg[0],"no") == 0) yesflag = 0;
   else error->all(FLERR,"Illegal partition command");
@@ -1186,7 +1196,7 @@ void Input::print()
         else fp = fopen(arg[iarg+1],"a");
         if (fp == NULL) {
           char str[128];
-          sprintf(str,"Cannot open print file %s",arg[iarg+1]);
+          snprintf(str,128,"Cannot open print file %s",arg[iarg+1]);
           error->one(FLERR,str);
         }
       }
@@ -1623,7 +1633,8 @@ void Input::kspace_modify()
 
 void Input::kspace_style()
 {
-  force->create_kspace(narg,arg,1);
+  force->create_kspace(arg[0],1);
+  if (force->kspace) force->kspace->settings(narg-1,&arg[1]);
 }
 
 /* ---------------------------------------------------------------------- */

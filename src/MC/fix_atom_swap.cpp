@@ -16,10 +16,10 @@
                          Alexander Stukowski
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <float.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cfloat>
+#include <cstdlib>
+#include <cstring>
 #include "fix_atom_swap.h"
 #include "atom.h"
 #include "atom_vec.h"
@@ -377,7 +377,7 @@ int FixAtomSwap::attempt_semi_grand()
   int success = 0;
   if (i >= 0)
     if (random_unequal->uniform() <
-      exp(-beta*(energy_after - energy_before
+      exp(beta*(energy_before - energy_after
             + mu[jtype] - mu[itype]))) success = 1;
 
   int success_all = 0;
@@ -695,7 +695,7 @@ void FixAtomSwap::update_swap_atoms_list()
 
 /* ---------------------------------------------------------------------- */
 
-int FixAtomSwap::pack_forward_comm(int n, int *list, double *buf, int pbc_flag, int *pbc)
+int FixAtomSwap::pack_forward_comm(int n, int *list, double *buf, int /*pbc_flag*/, int * /*pbc*/)
 {
   int i,j,m;
 

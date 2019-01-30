@@ -29,8 +29,8 @@
    Communications, 2015, 51: 11038-11040.
 ------------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "fix_mvv_edpd.h"
 #include "atom.h"
 #include "force.h"
@@ -78,7 +78,7 @@ void FixMvvEDPD::init()
    allow for both per-type and per-atom mass
 ------------------------------------------------------------------------- */
 
-void FixMvvEDPD::initial_integrate(int vflag)
+void FixMvvEDPD::initial_integrate(int /*vflag*/)
 {
   double dtfm,dtT;
   // update v and x and cc of atoms in group

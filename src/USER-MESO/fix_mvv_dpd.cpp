@@ -20,8 +20,8 @@
    Email: zhen_li@brown.edu
 ------------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "fix_mvv_dpd.h"
 #include "atom.h"
 #include "force.h"
@@ -72,7 +72,7 @@ void FixMvvDPD::init()
    allow for both per-type and per-atom mass
 ------------------------------------------------------------------------- */
 
-void FixMvvDPD::initial_integrate(int vflag)
+void FixMvvDPD::initial_integrate(int /*vflag*/)
 {
   double dtfm;
   double **x = atom->x;

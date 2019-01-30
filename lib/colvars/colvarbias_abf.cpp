@@ -17,17 +17,17 @@ colvarbias_abf::colvarbias_abf(char const *key)
   : colvarbias(key),
     b_UI_estimator(false),
     b_CZAR_estimator(false),
+    pabf_freq(0),
     system_force(NULL),
     gradients(NULL),
-    pmf(NULL),
     samples(NULL),
+    pmf(NULL),
     z_gradients(NULL),
     z_samples(NULL),
     czar_gradients(NULL),
     czar_pmf(NULL),
     last_gradients(NULL),
-    last_samples(NULL),
-    pabf_freq(0)
+    last_samples(NULL)
 {
 }
 
@@ -315,8 +315,6 @@ colvarbias_abf::~colvarbias_abf()
 
 int colvarbias_abf::update()
 {
-  int       iter;
-
   if (cvm::debug()) cvm::log("Updating ABF bias " + this->name);
 
   size_t i;
@@ -368,7 +366,12 @@ int colvarbias_abf::update()
     if ( b_integrate ) {
       if ( pabf_freq && cvm::step_relative() % pabf_freq == 0 ) {
         cvm::real err;
-        iter = pmf->integrate(integrate_steps, integrate_tol, err);
+        int iter = pmf->integrate(integrate_steps, integrate_tol, err);
+        if ( iter == integrate_steps ) {
+          cvm::log("Warning: PMF integration did not converge to " + cvm::to_str(integrate_tol)
+            + " in " + cvm::to_str(integrate_steps)
+            + " steps. Residual error: " +  cvm::to_str(err));
+        }
         pmf->set_zero_minimum(); // TODO: do this only when necessary
       }
     }
@@ -485,7 +488,6 @@ int colvarbias_abf::update()
 
 
 int colvarbias_abf::replica_share() {
-  int p;
 
   if ( !cvm::replica_enabled() ) {
     cvm::error("Error: shared ABF: No replicas.\n");
@@ -507,6 +509,7 @@ int colvarbias_abf::replica_share() {
   char* msg_data = new char[msg_total];
 
   if (cvm::replica_index() == 0) {
+    int p;
     // Replica 0 collects the delta gradient and count from the others.
     for (p = 1; p < cvm::replica_num(); p++) {
       // Receive the deltas.
@@ -561,6 +564,8 @@ int colvarbias_abf::replica_share() {
   return COLVARS_OK;
 }
 
+
+
 void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool append)
 {
   std::string  samples_out_name = prefix + ".count";
@@ -569,10 +574,7 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
 
   std::ostream *samples_os =
     cvm::proxy->output_stream(samples_out_name, mode);
-  if (!samples_os) {
-    cvm::error("Error opening ABF samples file " + samples_out_name + " for writing");
-    return;
-  }
+  if (!samples_os) return;
   samples->write_multicol(*samples_os);
   cvm::proxy->close_output_stream(samples_out_name);
 
@@ -580,10 +582,7 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
   if (num_variables() > 2) {
     std::string  samples_dx_out_name = prefix + ".count.dx";
     std::ostream *samples_dx_os = cvm::proxy->output_stream(samples_dx_out_name, mode);
-    if (!samples_os) {
-      cvm::error("Error opening samples file " + samples_dx_out_name + " for writing");
-      return;
-    }
+    if (!samples_os) return;
     samples->write_opendx(*samples_dx_os);
     *samples_dx_os << std::endl;
     cvm::proxy->close_output_stream(samples_dx_out_name);
@@ -591,10 +590,7 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
 
   std::ostream *gradients_os =
     cvm::proxy->output_stream(gradients_out_name, mode);
-  if (!gradients_os) {
-    cvm::error("Error opening ABF gradient file " + gradients_out_name + " for writing");
-    return;
-  }
+  if (!gradients_os) return;
   gradients->write_multicol(*gradients_os);
   cvm::proxy->close_output_stream(gradients_out_name);
 
@@ -606,20 +602,14 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
 
     std::string  pmf_out_name = prefix + ".pmf";
     std::ostream *pmf_os = cvm::proxy->output_stream(pmf_out_name, mode);
-    if (!pmf_os) {
-      cvm::error("Error opening pmf file " + pmf_out_name + " for writing");
-      return;
-    }
+    if (!pmf_os) return;
     pmf->write_multicol(*pmf_os);
 
     // In dimension higher than 2, dx is easier to handle and visualize
     if (num_variables() > 2) {
       std::string  pmf_dx_out_name = prefix + ".pmf.dx";
       std::ostream *pmf_dx_os = cvm::proxy->output_stream(pmf_dx_out_name, mode);
-      if (!pmf_dx_os) {
-        cvm::error("Error opening pmf file " + pmf_dx_out_name + " for writing");
-        return;
-      }
+      if (!pmf_dx_os) return;
       pmf->write_opendx(*pmf_dx_os);
       *pmf_dx_os << std::endl;
       cvm::proxy->close_output_stream(pmf_dx_out_name);
@@ -636,10 +626,7 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
 
     std::ostream *z_samples_os =
       cvm::proxy->output_stream(z_samples_out_name, mode);
-    if (!z_samples_os) {
-      cvm::error("Error opening eABF z-histogram file " + z_samples_out_name + " for writing");
-      return;
-    }
+    if (!z_samples_os) return;
     z_samples->write_multicol(*z_samples_os);
     cvm::proxy->close_output_stream(z_samples_out_name);
 
@@ -648,10 +635,7 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
 
       std::ostream *z_gradients_os =
         cvm::proxy->output_stream(z_gradients_out_name, mode);
-      if (!z_gradients_os) {
-        cvm::error("Error opening eABF z-gradient file " + z_gradients_out_name + " for writing");
-        return;
-      }
+      if (!z_gradients_os) return;
       z_gradients->write_multicol(*z_gradients_os);
       cvm::proxy->close_output_stream(z_gradients_out_name);
     }
@@ -669,10 +653,7 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
 
     std::ostream *czar_gradients_os =
       cvm::proxy->output_stream(czar_gradients_out_name, mode);
-    if (!czar_gradients_os) {
-      cvm::error("Error opening CZAR gradient file " + czar_gradients_out_name + " for writing");
-      return;
-    }
+    if (!czar_gradients_os) return;
     czar_gradients->write_multicol(*czar_gradients_os);
     cvm::proxy->close_output_stream(czar_gradients_out_name);
 
@@ -685,20 +666,14 @@ void colvarbias_abf::write_gradients_samples(const std::string &prefix, bool app
 
       std::string  czar_pmf_out_name = prefix + ".czar.pmf";
       std::ostream *czar_pmf_os = cvm::proxy->output_stream(czar_pmf_out_name, mode);
-      if (!czar_pmf_os) {
-        cvm::error("Error opening CZAR pmf file " + czar_pmf_out_name + " for writing");
-        return;
-      }
+      if (!czar_pmf_os) return;
       czar_pmf->write_multicol(*czar_pmf_os);
 
       // In dimension higher than 2, dx is easier to handle and visualize
       if (num_variables() > 2) {
         std::string  czar_pmf_dx_out_name = prefix + ".czar.pmf.dx";
         std::ostream *czar_pmf_dx_os = cvm::proxy->output_stream(czar_pmf_dx_out_name, mode);
-        if (!czar_pmf_dx_os) {
-          cvm::error("Error opening CZAR pmf file " + czar_pmf_dx_out_name + " for writing");
-          return;
-        }
+        if (!czar_pmf_dx_os) return;
         czar_pmf->write_opendx(*czar_pmf_dx_os);
         *czar_pmf_dx_os << std::endl;
         cvm::proxy->close_output_stream(czar_pmf_dx_out_name);
@@ -850,4 +825,10 @@ std::istream & colvarbias_abf::read_state_data(std::istream& is)
   }
 
   return is;
+}
+
+int colvarbias_abf::write_output_files()
+{
+  write_gradients_samples(output_prefix);
+  return COLVARS_OK;
 }

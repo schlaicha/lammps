@@ -11,9 +11,9 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
 #include "force.h"
 #include "style_bond.h"
 #include "style_angle.h"
@@ -77,6 +77,8 @@ Force::Force(LAMMPS *lmp) : Pointers(lmp)
   strcpy(improper_style,str);
   kspace_style = new char[n];
   strcpy(kspace_style,str);
+
+  pair_restart = NULL;
 
   // fill pair map with pair styles listed in style_pair.h
 
@@ -146,6 +148,8 @@ Force::~Force()
   delete [] improper_style;
   delete [] kspace_style;
 
+  delete [] pair_restart;
+
   if (pair) delete pair;
   if (bond) delete bond;
   if (angle) delete angle;
@@ -174,6 +178,16 @@ void Force::init()
 {
   qqrd2e = qqr2e/dielectric;
 
+  // check if pair style must be specified after restart
+  if (pair_restart) {
+    if (!pair) {
+      char msg[128];
+      snprintf(msg,128,"Must re-specify non-restarted pair style (%s) "
+               "after read_restart", pair_restart);
+      error->all(FLERR,msg);
+    }
+  }
+
   if (kspace) kspace->init();         // kspace must come before pair
   if (pair) pair->init();             // so g_ewald is defined
   if (bond) bond->init();
@@ -197,8 +211,10 @@ void Force::create_pair(const char *style, int trysuffix)
 {
   delete [] pair_style;
   if (pair) delete pair;
+  if (pair_restart) delete [] pair_restart;
   pair_style = NULL;
   pair = NULL;
+  pair_restart = NULL;
 
   int sflag;
   pair = new_pair(style,trysuffix,sflag);
@@ -649,14 +665,14 @@ Improper *Force::improper_match(const char *style)
    new kspace style
 ------------------------------------------------------------------------- */
 
-void Force::create_kspace(int narg, char **arg, int trysuffix)
+void Force::create_kspace(const char *style, int trysuffix)
 {
   delete [] kspace_style;
   if (kspace) delete kspace;
 
   int sflag;
-  kspace = new_kspace(narg,arg,trysuffix,sflag);
-  store_style(kspace_style,arg[0],sflag);
+  kspace = new_kspace(style,trysuffix,sflag);
+  store_style(kspace_style,style,sflag);
 
   if (comm->style == 1 && !kspace_match("ewald",0))
     error->all(FLERR,
@@ -667,39 +683,39 @@ void Force::create_kspace(int narg, char **arg, int trysuffix)
    generate a kspace class
 ------------------------------------------------------------------------- */
 
-KSpace *Force::new_kspace(int narg, char **arg, int trysuffix, int &sflag)
+KSpace *Force::new_kspace(const char *style, int trysuffix, int &sflag)
 {
   if (trysuffix && lmp->suffix_enable) {
     if (lmp->suffix) {
       sflag = 1;
       char estyle[256];
-      sprintf(estyle,"%s/%s",arg[0],lmp->suffix);
+      sprintf(estyle,"%s/%s",style,lmp->suffix);
       if (kspace_map->find(estyle) != kspace_map->end()) {
         KSpaceCreator kspace_creator = (*kspace_map)[estyle];
-        return kspace_creator(lmp, narg-1, &arg[1]);
+        return kspace_creator(lmp);
       }
     }
 
     if (lmp->suffix2) {
       sflag = 1;
       char estyle[256];
-      sprintf(estyle,"%s/%s",arg[0],lmp->suffix2);
+      sprintf(estyle,"%s/%s",style,lmp->suffix2);
       if (kspace_map->find(estyle) != kspace_map->end()) {
         KSpaceCreator kspace_creator = (*kspace_map)[estyle];
-        return kspace_creator(lmp, narg-1, &arg[1]);
+        return kspace_creator(lmp);
       }
     }
   }
 
   sflag = 0;
-  if (strcmp(arg[0],"none") == 0) return NULL;
-  if (kspace_map->find(arg[0]) != kspace_map->end()) {
-    KSpaceCreator kspace_creator = (*kspace_map)[arg[0]];
-    return kspace_creator(lmp, narg-1, &arg[1]);
+  if (strcmp(style,"none") == 0) return NULL;
+  if (kspace_map->find(style) != kspace_map->end()) {
+    KSpaceCreator kspace_creator = (*kspace_map)[style];
+    return kspace_creator(lmp);
   }
 
   char str[128];
-  sprintf(str,"Unknown kspace style %s",arg[0]);
+  sprintf(str,"Unknown kspace style %s",style);
   error->all(FLERR,str);
 
   return NULL;
@@ -710,9 +726,9 @@ KSpace *Force::new_kspace(int narg, char **arg, int trysuffix, int &sflag)
 ------------------------------------------------------------------------- */
 
 template <typename T>
-KSpace *Force::kspace_creator(LAMMPS *lmp, int narg, char ** arg)
+KSpace *Force::kspace_creator(LAMMPS *lmp)
 {
-  return new T(lmp, narg, arg);
+  return new T(lmp);
 }
 
 /* ----------------------------------------------------------------------

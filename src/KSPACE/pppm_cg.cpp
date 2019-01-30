@@ -16,9 +16,9 @@
 ------------------------------------------------------------------------- */
 
 #include <mpi.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 #include "atom.h"
 #include "gridcomm.h"
@@ -48,17 +48,26 @@ enum{FORWARD_IK,FORWARD_AD,FORWARD_IK_PERATOM,FORWARD_AD_PERATOM};
 
 /* ---------------------------------------------------------------------- */
 
-PPPMCG::PPPMCG(LAMMPS *lmp, int narg, char **arg) : PPPM(lmp, narg, arg),
+PPPMCG::PPPMCG(LAMMPS *lmp) : PPPM(lmp),
   is_charged(NULL)
+{
+  num_charged = -1;
+  group_group_enable = 1;
+}
+
+/* ---------------------------------------------------------------------- */
+
+void PPPMCG::settings(int narg, char **arg)
 {
   if ((narg < 1) || (narg > 2))
     error->all(FLERR,"Illegal kspace_style pppm/cg command");
 
+  // first argument is processed in parent class
+
+  PPPM::settings(narg,arg);
+
   if (narg == 2) smallq = fabs(force->numeric(FLERR,arg[1]));
   else smallq = SMALLQ;
-
-  num_charged = -1;
-  group_group_enable = 1;
 }
 
 /* ----------------------------------------------------------------------
@@ -284,7 +293,7 @@ void PPPMCG::particle_map()
 
   double **x = atom->x;
 
-  if (!ISFINITE(boxlo[0]) || !ISFINITE(boxlo[1]) || !ISFINITE(boxlo[2]))
+  if (!std::isfinite(boxlo[0]) || !std::isfinite(boxlo[1]) || !std::isfinite(boxlo[2]))
     error->one(FLERR,"Non-numeric box dimensions - simulation unstable");
 
   int flag = 0;

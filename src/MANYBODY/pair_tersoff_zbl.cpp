@@ -16,10 +16,10 @@
                         David Farrell (NWU) - ZBL addition
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "pair_tersoff_zbl.h"
 #include "atom.h"
 #include "update.h"
@@ -77,7 +77,7 @@ void PairTersoffZBL::read_file(char *file)
     fp = force->open_potential(file);
     if (fp == NULL) {
       char str[128];
-      sprintf(str,"Cannot open Tersoff potential file %s",file);
+      snprintf(str,128,"Cannot open Tersoff potential file %s",file);
       error->one(FLERR,str);
     }
   }

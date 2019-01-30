@@ -16,9 +16,9 @@
                          Ya Zhou (Penn State University)
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include "pair_momb.h"
 #include "atom.h"
 #include "comm.h"
@@ -365,8 +365,8 @@ void PairMomb::read_restart_settings(FILE *fp)
 
 /* ---------------------------------------------------------------------- */
 
-double PairMomb::single(int i, int j, int itype, int jtype, double rsq,
-                         double factor_coul, double factor_lj,
+double PairMomb::single(int /*i*/, int /*j*/, int itype, int jtype, double rsq,
+                         double /*factor_coul*/, double factor_lj,
                          double &fforce)
 {
   double r,dr,dexp,phi,r2inv,r6inv,ddexp,invexp;

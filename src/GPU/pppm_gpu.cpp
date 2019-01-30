@@ -16,10 +16,10 @@
 ------------------------------------------------------------------------- */
 
 #include <mpi.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include "pppm_gpu.h"
 #include "atom.h"
 #include "comm.h"
@@ -89,10 +89,8 @@ void PPPM_GPU_API(forces)(double **f);
 
 /* ---------------------------------------------------------------------- */
 
-PPPMGPU::PPPMGPU(LAMMPS *lmp, int narg, char **arg) : PPPM(lmp, narg, arg)
+PPPMGPU::PPPMGPU(LAMMPS *lmp) : PPPM(lmp)
 {
-  if (narg != 1) error->all(FLERR,"Illegal kspace_style pppm/gpu command");
-
   triclinic_support = 0;
   density_brick_gpu = vd_brick = NULL;
   kspace_split = false;

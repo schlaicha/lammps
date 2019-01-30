@@ -15,10 +15,10 @@
    Contributing author: Ray Shan (Sandia)
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "fix_qeq_dynamic.h"
 #include "atom.h"
 #include "comm.h"
@@ -88,7 +88,7 @@ void FixQEqDynamic::init()
 
 /* ---------------------------------------------------------------------- */
 
-void FixQEqDynamic::pre_force(int vflag)
+void FixQEqDynamic::pre_force(int /*vflag*/)
 {
   int i,ii,iloop,inum,*ilist;
   double qmass,dtq2;
@@ -247,7 +247,7 @@ double FixQEqDynamic::compute_eneg()
 /* ---------------------------------------------------------------------- */
 
 int FixQEqDynamic::pack_forward_comm(int n, int *list, double *buf,
-                          int pbc_flag, int *pbc)
+                          int /*pbc_flag*/, int * /*pbc*/)
 {
   int m=0;
 

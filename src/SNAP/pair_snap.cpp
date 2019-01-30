@@ -11,9 +11,9 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include "pair_snap.h"
 #include "atom.h"
 #include "atom_vec.h"
@@ -278,14 +278,15 @@ void PairSNAP::compute_regular(int eflag, int vflag)
           double bveci = snaptr->bvec[icoeff];
           double fack = coeffi[k]*bveci;
           double* dbveci = snaptr->dbvec[icoeff];
-          fij[0] += fack*snaptr->dbvec[icoeff][0];
-          fij[1] += fack*snaptr->dbvec[icoeff][1];
-          fij[2] += fack*snaptr->dbvec[icoeff][2];
+          fij[0] += fack*dbveci[0];
+          fij[1] += fack*dbveci[1];
+          fij[2] += fack*dbveci[2];
           k++;
           for (int jcoeff = icoeff+1; jcoeff < ncoeff; jcoeff++) {
             double facki = coeffi[k]*bveci;
             double fackj = coeffi[k]*snaptr->bvec[jcoeff];
             double* dbvecj = snaptr->dbvec[jcoeff];
+
             fij[0] += facki*dbvecj[0]+fackj*dbveci[0];
             fij[1] += facki*dbvecj[1]+fackj*dbveci[1];
             fij[2] += facki*dbvecj[2]+fackj*dbveci[2];
@@ -1528,9 +1529,9 @@ void PairSNAP::coeff(int narg, char **arg)
       sna[tid]->grow_rij(nmax);
   }
 
-  if (comm->me == 0)
-    printf("ncoeff = %d snancoeff = %d \n",ncoeff,sna[0]->ncoeff);
   if (ncoeff != sna[0]->ncoeff) {
+    if (comm->me == 0)
+      printf("ncoeff = %d snancoeff = %d \n",ncoeff,sna[0]->ncoeff);
     error->all(FLERR,"Incorrect SNAP parameter file");
   }
 
@@ -1590,7 +1591,7 @@ void PairSNAP::read_files(char *coefffilename, char *paramfilename)
     fpcoeff = force->open_potential(coefffilename);
     if (fpcoeff == NULL) {
       char str[128];
-      sprintf(str,"Cannot open SNAP coefficient file %s",coefffilename);
+      snprintf(str,128,"Cannot open SNAP coefficient file %s",coefffilename);
       error->one(FLERR,str);
     }
   }
@@ -1756,7 +1757,7 @@ void PairSNAP::read_files(char *coefffilename, char *paramfilename)
     fpparam = force->open_potential(paramfilename);
     if (fpparam == NULL) {
       char str[128];
-      sprintf(str,"Cannot open SNAP parameter file %s",paramfilename);
+      snprintf(str,128,"Cannot open SNAP parameter file %s",paramfilename);
       error->one(FLERR,str);
     }
   }

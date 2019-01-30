@@ -22,9 +22,9 @@
  See the README file in the top-level LAMMPS directory.
  ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include "fix_smd_adjust_dt.h"
 #include "atom.h"
 #include "update.h"
@@ -86,13 +86,13 @@ void FixSMDTlsphDtReset::init() {
 
 /* ---------------------------------------------------------------------- */
 
-void FixSMDTlsphDtReset::setup(int vflag) {
+void FixSMDTlsphDtReset::setup(int /*vflag*/) {
         end_of_step();
 }
 
 /* ---------------------------------------------------------------------- */
 
-void FixSMDTlsphDtReset::initial_integrate(int vflag) {
+void FixSMDTlsphDtReset::initial_integrate(int /*vflag*/) {
 
         //printf("in adjust_dt: dt = %20.10f\n", update->dt);
 

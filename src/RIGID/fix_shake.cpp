@@ -12,10 +12,10 @@
 ------------------------------------------------------------------------- */
 
 #include <mpi.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
 #include "fix_shake.h"
 #include "fix_rattle.h"
 #include "atom.h"
@@ -2451,7 +2451,7 @@ void FixShake::grow_arrays(int nmax)
    copy values within local atom-based arrays
 ------------------------------------------------------------------------- */
 
-void FixShake::copy_arrays(int i, int j, int delflag)
+void FixShake::copy_arrays(int i, int j, int /*delflag*/)
 {
   int flag = shake_flag[j] = shake_flag[i];
   if (flag == 1) {
@@ -2528,7 +2528,7 @@ void FixShake::update_arrays(int i, int atom_offset)
 ------------------------------------------------------------------------- */
 
 void FixShake::set_molecule(int nlocalprev, tagint tagprev, int imol,
-                            double *xgeom, double *vcm, double *quat)
+                            double * /*xgeom*/, double * /*vcm*/, double * /*quat*/)
 {
   int m,flag;
 

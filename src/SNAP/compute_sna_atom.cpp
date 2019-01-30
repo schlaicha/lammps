@@ -11,8 +11,8 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 #include "sna.h"
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include "compute_sna_atom.h"
 #include "atom.h"
 #include "update.h"
@@ -115,7 +115,8 @@ ComputeSNAAtom::ComputeSNAAtom(LAMMPS *lmp, int narg, char **arg) :
     } else error->all(FLERR,"Illegal compute sna/atom command");
   }
 
-  snaptr = new SNA*[comm->nthreads];
+  nthreads = comm->nthreads;
+  snaptr = new SNA*[nthreads];
 #if defined(_OPENMP)
 #pragma omp parallel default(none) shared(lmp,rfac0,twojmax,rmin0,switchflag,bzeroflag)
 #endif
@@ -146,6 +147,8 @@ ComputeSNAAtom::~ComputeSNAAtom()
   memory->destroy(radelem);
   memory->destroy(wjelem);
   memory->destroy(cutsq);
+  for (int tid = 0; tid<nthreads; tid++)
+    delete snaptr[tid];
   delete [] snaptr;
 }
 
@@ -184,7 +187,7 @@ void ComputeSNAAtom::init()
 
 /* ---------------------------------------------------------------------- */
 
-void ComputeSNAAtom::init_list(int id, NeighList *ptr)
+void ComputeSNAAtom::init_list(int /*id*/, NeighList *ptr)
 {
   list = ptr;
 }
@@ -276,9 +279,13 @@ void ComputeSNAAtom::compute_peratom()
         for (int icoeff = 0; icoeff < ncoeff; icoeff++) {
           double bi = snaptr[tid]->bvec[icoeff];
 
+          // diagonal element of quadratic matrix
+
+          sna[i][ncount++] = 0.5*bi*bi;
+
           // upper-triangular elements of quadratic matrix
 
-          for (int jcoeff = icoeff; jcoeff < ncoeff; jcoeff++)
+          for (int jcoeff = icoeff+1; jcoeff < ncoeff; jcoeff++)
             sna[i][ncount++] = bi*snaptr[tid]->bvec[jcoeff];
         }
       }

@@ -11,8 +11,8 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include "atom_vec.h"
 #include "atom.h"
 #include "force.h"
@@ -66,7 +66,7 @@ void AtomVec::store_args(int narg, char **arg)
    no additional args by default
 ------------------------------------------------------------------------- */
 
-void AtomVec::process_args(int narg, char **arg)
+void AtomVec::process_args(int narg, char ** /*arg*/)
 {
   if (narg) error->all(FLERR,"Invalid atom_style command");
 }

@@ -12,11 +12,11 @@
 ------------------------------------------------------------------------- */
 
 #include <mpi.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <climits>
 #include "atom.h"
 #include "style_atom.h"
 #include "atom_vec.h"
@@ -50,8 +50,6 @@ using namespace MathConst;
 #define DELTA 1
 #define DELTA_MEMSTR 1024
 #define EPSILON 1.0e-6
-
-enum{LAYOUT_UNIFORM,LAYOUT_NONUNIFORM,LAYOUT_TILED};    // several files
 
 /* ---------------------------------------------------------------------- */
 
@@ -97,6 +95,10 @@ Atom::Atom(LAMMPS *lmp) : Pointers(lmp)
 
   rho = drho = e = de = cv = NULL;
   vest = NULL;
+
+  // SPIN package
+
+  sp = fm = NULL;
 
   // USER-DPD
 
@@ -167,6 +169,10 @@ Atom::Atom(LAMMPS *lmp) : Pointers(lmp)
   omega_flag = torque_flag = angmom_flag = 0;
   radius_flag = rmass_flag = 0;
   ellipsoid_flag = line_flag = tri_flag = body_flag = 0;
+
+  // magnetic flags
+
+  sp_flag = 0;
 
   vfrac_flag = 0;
   spin_flag = eradius_flag = ervel_flag = erforce_flag = ervelforce_flag = 0;
@@ -268,6 +274,9 @@ Atom::~Atom()
   memory->destroy(line);
   memory->destroy(tri);
   memory->destroy(body);
+
+  memory->destroy(sp);
+  memory->destroy(fm);
 
   memory->destroy(vfrac);
   memory->destroy(s0);
@@ -420,6 +429,10 @@ void Atom::create_avec(const char *style, int narg, char **arg, int trysuffix)
   omega_flag = torque_flag = angmom_flag = 0;
   radius_flag = rmass_flag = 0;
   ellipsoid_flag = line_flag = tri_flag = body_flag = 0;
+
+  // magnetic flags
+
+  sp_flag = 0;
 
   vfrac_flag = 0;
   spin_flag = eradius_flag = ervel_flag = erforce_flag = ervelforce_flag = 0;
@@ -866,7 +879,7 @@ void Atom::data_atoms(int n, char *buf, tagint id_offset, tagint mol_offset,
     sublo[2] = domain->sublo_lamda[2]; subhi[2] = domain->subhi_lamda[2];
   }
 
-  if (comm->layout != LAYOUT_TILED) {
+  if (comm->layout != Comm::LAYOUT_TILED) {
     if (domain->xperiodic) {
       if (comm->myloc[0] == 0) sublo[0] -= epsilon[0];
       if (comm->myloc[0] == comm->procgrid[0]-1) subhi[0] += epsilon[0];
@@ -1503,7 +1516,7 @@ void Atom::set_mass(const char *file, int line, int itype, double value)
    called from reading of input script
 ------------------------------------------------------------------------- */
 
-void Atom::set_mass(const char *file, int line, int narg, char **arg)
+void Atom::set_mass(const char *file, int line, int /*narg*/, char **arg)
 {
   if (mass == NULL) error->all(file,line,"Cannot set mass for this atom style");
 
@@ -1520,7 +1533,8 @@ void Atom::set_mass(const char *file, int line, int narg, char **arg)
 }
 
 /* ----------------------------------------------------------------------
-   set all masses as read in from restart file
+   set all masses
+   called from reading of restart file, also from ServerMD
 ------------------------------------------------------------------------- */
 
 void Atom::set_mass(double *values)
@@ -1870,11 +1884,19 @@ void Atom::setup_sort_bins()
   // user setting if explicitly set
   // default = 1/2 of neighbor cutoff
   // check if neighbor cutoff = 0.0
+  // and in that case, disable sorting
 
   double binsize;
   if (userbinsize > 0.0) binsize = userbinsize;
-  else binsize = 0.5 * neighbor->cutneighmax;
-  if (binsize == 0.0) error->all(FLERR,"Atom sorting has bin size = 0.0");
+  else if (neighbor->cutneighmax > 0.0) binsize = 0.5 * neighbor->cutneighmax;
+
+  if ((binsize == 0.0) && (sortfreq > 0)) {
+    sortfreq = 0;
+    if (comm->me == 0)
+          error->warning(FLERR,"No pairwise cutoff or binsize set. "
+                         "Atom sorting therefore disabled.");
+    return;
+  }
 
   double bininv = 1.0/binsize;
 

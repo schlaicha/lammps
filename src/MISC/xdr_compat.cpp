@@ -1,6 +1,6 @@
-#include <stdlib.h>
-#include <limits.h>
-#include <string.h>
+#include <cstdlib>
+#include <climits>
+#include <cstring>
 #include "xdr_compat.h"
 
 /* This file is needed for systems, that do not provide XDR support
@@ -650,7 +650,7 @@ xdrstdio_setpos (XDR *xdrs, unsigned int pos)
 }
 
 static xdr_int32_t *
-xdrstdio_inline (XDR *xdrs, int len)
+xdrstdio_inline (XDR * /*xdrs*/, int /*len*/)
 {
   /*
    * Must do some work to implement this: must insure

@@ -11,9 +11,9 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstring>
+#include <cstdlib>
 #include "compute_pair_local.h"
 #include "atom.h"
 #include "update.h"
@@ -139,7 +139,7 @@ void ComputePairLocal::init()
 
 /* ---------------------------------------------------------------------- */
 
-void ComputePairLocal::init_list(int id, NeighList *ptr)
+void ComputePairLocal::init_list(int /*id*/, NeighList *ptr)
 {
   list = ptr;
 }

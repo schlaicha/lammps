@@ -14,10 +14,10 @@
    Contributing author: Oliver Henrich (University of Strathclyde, Glasgow)
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "pair_oxdna2_coaxstk.h"
 #include "mf_oxdna.h"
 #include "atom.h"
@@ -64,6 +64,7 @@ PairOxdna2Coaxstk::~PairOxdna2Coaxstk()
     memory->destroy(cut_cxst_hc);
     memory->destroy(b_cxst_lo);
     memory->destroy(b_cxst_hi);
+    memory->destroy(cutsq_cxst_hc);
 
     memory->destroy(a_cxst1);
     memory->destroy(theta_cxst1_0);
@@ -103,9 +104,9 @@ PairOxdna2Coaxstk::~PairOxdna2Coaxstk()
 void PairOxdna2Coaxstk::compute(int eflag, int vflag)
 {
 
-  double delf[3],delt[3],delta[3],deltb[3]; // force, torque increment;
+  double delf[3],delta[3],deltb[3]; // force, torque increment;
   double evdwl,fpair,finc,tpair,factor_lj;
-  double v1tmp[3],v2tmp[3],v3tmp[3];
+  double v1tmp[3];
   double delr_ss[3],delr_ss_norm[3],rsq_ss,r_ss,rinv_ss;
   double delr_st[3],delr_st_norm[3],rsq_st,r_st,rinv_st;
   double theta1,theta1p,t1dir[3],cost1;
@@ -113,12 +114,6 @@ void PairOxdna2Coaxstk::compute(int eflag, int vflag)
   double theta5,theta5p,t5dir[3],cost5;
   double theta6,theta6p,t6dir[3],cost6;
   double cosphi3;
-
-  double gamma,gammacub,rinv_ss_cub,fac;
-  double aybx,azbx,rax,ray,raz,rbx;
-  double dcdr,dcdrbx;
-  double dcdaxbx,dcdaybx,dcdazbx;
-  double dcdrax,dcdray,dcdraz;
 
   // distances COM-backbone site, COM-stacking site
   double d_cs=-0.4, d_cst=+0.34;
@@ -157,7 +152,7 @@ void PairOxdna2Coaxstk::compute(int eflag, int vflag)
   numneigh = list->numneigh;
   firstneigh = list->firstneigh;
 
-  // loop over pair interaction neighbours of my atoms
+  // loop over pair interaction neighbors of my atoms
 
   for (ia = 0; ia < anum; ia++) {
 
@@ -183,7 +178,7 @@ void PairOxdna2Coaxstk::compute(int eflag, int vflag)
     for (ib = 0; ib < bnum; ib++) {
 
       b = blist[ib];
-      factor_lj = special_lj[sbmask(b)]; // = 0 for nearest neighbours
+      factor_lj = special_lj[sbmask(b)]; // = 0 for nearest neighbors
       b &= NEIGHMASK;
 
       btype = type[b];
@@ -542,7 +537,7 @@ void PairOxdna2Coaxstk::allocate()
    global settings
 ------------------------------------------------------------------------- */
 
-void PairOxdna2Coaxstk::settings(int narg, char **arg)
+void PairOxdna2Coaxstk::settings(int narg, char **/*arg*/)
 {
   if (narg != 0) error->all(FLERR,"Illegal pair_style command");
 

@@ -17,9 +17,9 @@
 
 #include "lmptype.h"
 #include <mpi.h>
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 #include "neb.h"
 #include "universe.h"
 #include "atom.h"
@@ -303,7 +303,7 @@ void NEB::run()
   update->minimize->setup();
 
   if (me_universe == 0) {
-    if (uscreen)
+    if (uscreen) {
       if (verbose) {
         fprintf(uscreen,"Step MaxReplicaForce MaxAtomForce "
                 "GradV0 GradV1 GradVc EBF EBR RDT "
@@ -317,7 +317,8 @@ void NEB::run()
                 "EBF EBR RDT "
                 "RD1 PE1 RD2 PE2 ... RDN PEN\n");
       }
-    if (ulogfile)
+    }
+    if (ulogfile) {
       if (verbose) {
         fprintf(ulogfile,"Step MaxReplicaForce MaxAtomForce "
                 "GradV0 GradV1 GradVc EBF EBR RDT "
@@ -331,6 +332,7 @@ void NEB::run()
                 "EBF EBR RDT "
                 "RD1 PE1 RD2 PE2 ... RDN PEN\n");
       }
+    }
   }
   print_status();
 
@@ -547,7 +549,7 @@ void NEB::open(char *file)
   else {
 #ifdef LAMMPS_GZIP
     char gunzip[128];
-    sprintf(gunzip,"gzip -c -d %s",file);
+    snprintf(gunzip,128,"gzip -c -d %s",file);
 
 #ifdef _WIN32
     fp = _popen(gunzip,"rb");
@@ -562,7 +564,7 @@ void NEB::open(char *file)
 
   if (fp == NULL) {
     char str[128];
-    sprintf(str,"Cannot open file %s",file);
+    snprintf(str,128,"Cannot open file %s",file);
     error->one(FLERR,str);
   }
 }
@@ -588,7 +590,7 @@ void NEB::print_status()
     MPI_Allgather(&fnorminf,1,MPI_DOUBLE,&fmaxatomInRepl[0],1,MPI_DOUBLE,roots);
   }
 
-  double one[numall];
+  double one[7];
   one[0] = fneb->veng;
   one[1] = fneb->plen;
   one[2] = fneb->nlen;

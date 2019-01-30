@@ -22,12 +22,12 @@
  See the README file in the top-level LAMMPS directory.
  ------------------------------------------------------------------------- */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <Eigen/Eigen>
 #include "fix_smd_integrate_ulsph.h"
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
 #include "atom.h"
 #include "comm.h"
 #include "force.h"
@@ -41,7 +41,6 @@
 #include "error.h"
 #include "pair.h"
 #include "domain.h"
-#include <Eigen/Eigen>
 
 using namespace Eigen;
 using namespace LAMMPS_NS;
@@ -120,7 +119,7 @@ FixSMDIntegrateUlsph::FixSMDIntegrateUlsph(LAMMPS *lmp, int narg, char **arg) :
                         }
                 } else {
                         char msg[128];
-                        sprintf(msg, "Illegal keyword for smd/integrate_ulsph: %s\n", arg[iarg]);
+                        snprintf(msg,128, "Illegal keyword for smd/integrate_ulsph: %s\n", arg[iarg]);
                         error->all(FLERR, msg);
                 }
 
@@ -159,7 +158,7 @@ void FixSMDIntegrateUlsph::init() {
  allow for both per-type and per-atom mass
  ------------------------------------------------------------------------- */
 
-void FixSMDIntegrateUlsph::initial_integrate(int vflag) {
+void FixSMDIntegrateUlsph::initial_integrate(int /*vflag*/) {
         double **x = atom->x;
         double **v = atom->v;
         double **f = atom->f;

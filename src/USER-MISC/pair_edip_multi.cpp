@@ -17,11 +17,11 @@
    Contributing author: Chao Jiang
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <float.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cfloat>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include "pair_edip_multi.h"
 #include "atom.h"
 #include "neighbor.h"
@@ -106,7 +106,7 @@ void PairEDIPMulti::compute(int eflag, int vflag)
   int itype,jtype,ktype,ijparam,ikparam,ijkparam;
   double xtmp,ytmp,ztmp,evdwl;
   int *ilist,*jlist,*numneigh,**firstneigh;
-  register int preForceCoord_counter;
+  int preForceCoord_counter;
 
   double zeta_i;
   double dzetair;
@@ -516,7 +516,7 @@ void PairEDIPMulti::allocate()
    global settings
 ------------------------------------------------------------------------- */
 
-void PairEDIPMulti::settings(int narg, char **arg)
+void PairEDIPMulti::settings(int narg, char **/*arg*/)
 {
   if (narg != 0) error->all(FLERR,"Illegal pair_style command");
 }
@@ -644,7 +644,7 @@ void PairEDIPMulti::read_file(char *file)
     fp = force->open_potential(file);
     if (fp == NULL) {
       char str[128];
-      sprintf(str,"Cannot open EDIP potential file %s",file);
+      snprintf(str,128,"Cannot open EDIP potential file %s",file);
       error->one(FLERR,str);
     }
   }

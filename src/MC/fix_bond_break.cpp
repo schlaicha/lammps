@@ -11,10 +11,10 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
-#include <math.h>
+#include <cmath>
 #include <mpi.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include "fix_bond_break.h"
 #include "update.h"
 #include "respa.h"
@@ -693,7 +693,7 @@ int FixBondBreak::dedup(int nstart, int nstop, tagint *copy)
 
 /* ---------------------------------------------------------------------- */
 
-void FixBondBreak::post_integrate_respa(int ilevel, int iloop)
+void FixBondBreak::post_integrate_respa(int ilevel, int /*iloop*/)
 {
   if (ilevel == nlevels_respa-1) post_integrate();
 }
@@ -701,7 +701,7 @@ void FixBondBreak::post_integrate_respa(int ilevel, int iloop)
 /* ---------------------------------------------------------------------- */
 
 int FixBondBreak::pack_forward_comm(int n, int *list, double *buf,
-                                    int pbc_flag, int *pbc)
+                                    int /*pbc_flag*/, int * /*pbc*/)
 {
   int i,j,k,m,ns;
 
