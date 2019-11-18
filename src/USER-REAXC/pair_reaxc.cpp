@@ -21,6 +21,11 @@
 ------------------------------------------------------------------------- */
 
 #include "pair_reaxc.h"
+#include <mpi.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+#include <strings.h>
 #include "atom.h"
 #include "update.h"
 #include "force.h"
@@ -35,6 +40,7 @@
 #include "memory.h"
 #include "error.h"
 
+#include "reaxc_defs.h"
 #include "reaxc_types.h"
 #include "reaxc_allocate.h"
 #include "reaxc_control.h"
@@ -45,9 +51,7 @@
 #include "reaxc_list.h"
 #include "reaxc_lookup.h"
 #include "reaxc_reset_tools.h"
-#include "reaxc_traj.h"
 #include "reaxc_vector.h"
-#include "fix_reaxc_bonds.h"
 
 using namespace LAMMPS_NS;
 
@@ -73,6 +77,9 @@ PairReaxC::PairReaxC(LAMMPS *lmp) : Pair(lmp)
   one_coeff = 1;
   manybody_flag = 1;
   ghostneigh = 1;
+
+  fix_id = new char[24];
+  snprintf(fix_id,24,"REAXC_%d",instance_me);
 
   system = (reax_system *)
     memory->smalloc(sizeof(reax_system),"reax:system");
@@ -135,7 +142,8 @@ PairReaxC::~PairReaxC()
 {
   if (copymode) return;
 
-  if (fix_reax) modify->delete_fix("REAXC");
+  if (fix_reax) modify->delete_fix(fix_id);
+  delete[] fix_id;
 
   if (setup_flag) {
     Close_Output_Files( system, control, out_control, mpi_data );
@@ -412,7 +420,7 @@ void PairReaxC::init_style( )
 
   if (fix_reax == NULL) {
     char **fixarg = new char*[3];
-    fixarg[0] = (char *) "REAXC";
+    fixarg[0] = (char *) fix_id;
     fixarg[1] = (char *) "all";
     fixarg[2] = (char *) "REAXC";
     modify->add_fix(3,fixarg);

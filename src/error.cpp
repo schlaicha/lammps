@@ -11,14 +11,17 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+#include "error.h"
 #include <mpi.h>
 #include <cstdlib>
 #include <cstring>
-#include "error.h"
 #include "universe.h"
-#include "update.h"
 #include "output.h"
 #include "input.h"
+
+#if defined(LAMMPS_EXCEPTIONS)
+#include "update.h"
+#endif
 
 using namespace LAMMPS_NS;
 
@@ -212,6 +215,8 @@ void Error::one(const char *file, int line, const char *str)
   snprintf(msg, 100, "ERROR on proc %d: %s (%s:%d)\n", me, str, truncpath(file), line);
   throw LAMMPSAbortException(msg, world);
 #else
+  if (screen) fflush(screen);
+  if (logfile) fflush(logfile);
   MPI_Abort(world,1);
 #endif
 }
