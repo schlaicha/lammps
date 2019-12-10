@@ -97,14 +97,14 @@ FixWallReflect::FixWallReflect(LAMMPS *lmp, int narg, char **arg) :
 
   if (nwall == 0) error->all(FLERR,"Illegal fix wall command");
 
-  for (int m = 0; m < nwall; m++) {
-    if ((wallwhich[m] == XLO || wallwhich[m] == XHI) && domain->xperiodic)
-      error->all(FLERR,"Cannot use fix wall/reflect in periodic dimension");
-    if ((wallwhich[m] == YLO || wallwhich[m] == YHI) && domain->yperiodic)
-      error->all(FLERR,"Cannot use fix wall/reflect in periodic dimension");
-    if ((wallwhich[m] == ZLO || wallwhich[m] == ZHI) && domain->zperiodic)
-      error->all(FLERR,"Cannot use fix wall/reflect in periodic dimension");
-  }
+  //for (int m = 0; m < nwall; m++) {
+  //  if ((wallwhich[m] == XLO || wallwhich[m] == XHI) && domain->xperiodic)
+  //    error->all(FLERR,"Cannot use fix wall/reflect in periodic dimension");
+  //  if ((wallwhich[m] == YLO || wallwhich[m] == YHI) && domain->yperiodic)
+  //    error->all(FLERR,"Cannot use fix wall/reflect in periodic dimension");
+  //  if ((wallwhich[m] == ZLO || wallwhich[m] == ZHI) && domain->zperiodic)
+  //    error->all(FLERR,"Cannot use fix wall/reflect in periodic dimension");
+  //}
 
   for (int m = 0; m < nwall; m++)
     if ((wallwhich[m] == ZLO || wallwhich[m] == ZHI) && domain->dimension == 2)
