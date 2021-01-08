@@ -20,8 +20,9 @@ parenthesis: g = GPU, i = USER-INTEL, k = KOKKOS, o = USER-OMP, t =
 OPT.
 
 .. table_from_list::
-   :columns: 6
+   :columns: 5
 
+   * :doc:`accelerate/cos <fix_accelerate_cos>`
    * :doc:`adapt <fix_adapt>`
    * :doc:`adapt/fep <fix_adapt_fep>`
    * :doc:`addforce <fix_addforce>`
@@ -41,6 +42,7 @@ OPT.
    * :doc:`bocs <fix_bocs>`
    * :doc:`bond/break <fix_bond_break>`
    * :doc:`bond/create <fix_bond_create>`
+   * :doc:`bond/create/angle <fix_bond_create>`
    * :doc:`bond/react <fix_bond_react>`
    * :doc:`bond/swap <fix_bond_swap>`
    * :doc:`box/relax <fix_box_relax>`
@@ -60,6 +62,7 @@ OPT.
    * :doc:`efield <fix_efield>`
    * :doc:`ehex <fix_ehex>`
    * :doc:`electron/stopping <fix_electron_stopping>`
+   * :doc:`electron/stopping/fit <fix_electron_stopping>`
    * :doc:`enforce2d (k) <fix_enforce2d>`
    * :doc:`eos/cv <fix_eos_cv>`
    * :doc:`eos/table <fix_eos_table>`
@@ -94,10 +97,9 @@ OPT.
    * :doc:`lb/viscous <fix_lb_viscous>`
    * :doc:`lineforce <fix_lineforce>`
    * :doc:`manifoldforce <fix_manifoldforce>`
-   * :doc:`meso <fix_meso>`
    * :doc:`meso/move <fix_meso_move>`
-   * :doc:`meso/stationary <fix_meso_stationary>`
    * :doc:`momentum (k) <fix_momentum>`
+   * :doc:`momentum/chunk <fix_momentum>`
    * :doc:`move <fix_move>`
    * :doc:`mscg <fix_mscg>`
    * :doc:`msst <fix_msst>`
@@ -105,19 +107,21 @@ OPT.
    * :doc:`mvv/edpd <fix_mvv_dpd>`
    * :doc:`mvv/tdpd <fix_mvv_dpd>`
    * :doc:`neb <fix_neb>`
-   * :doc:`neb\_spin <fix_neb_spin>`
+   * :doc:`neb/spin <fix_neb_spin>`
    * :doc:`nph (ko) <fix_nh>`
    * :doc:`nph/asphere (o) <fix_nph_asphere>`
    * :doc:`nph/body <fix_nph_body>`
    * :doc:`nph/eff <fix_nh_eff>`
    * :doc:`nph/sphere (o) <fix_nph_sphere>`
-   * :doc:`nphug (o) <fix_nphug>`
+   * :doc:`nphug <fix_nphug>`
    * :doc:`npt (iko) <fix_nh>`
    * :doc:`npt/asphere (o) <fix_npt_asphere>`
    * :doc:`npt/body <fix_npt_body>`
+   * :doc:`npt/cauchy <fix_npt_cauchy>`
    * :doc:`npt/eff <fix_nh_eff>`
    * :doc:`npt/sphere (o) <fix_npt_sphere>`
    * :doc:`npt/uef <fix_nh_uef>`
+   * :doc:`numdiff <fix_numdiff>`
    * :doc:`nve (iko) <fix_nve>`
    * :doc:`nve/asphere (i) <fix_nve_asphere>`
    * :doc:`nve/asphere/noforce <fix_nve_asphere_noforce>`
@@ -146,6 +150,8 @@ OPT.
    * :doc:`oneway <fix_oneway>`
    * :doc:`orient/bcc <fix_orient>`
    * :doc:`orient/fcc <fix_orient>`
+   * :doc:`orient/eco <fix_orient_eco>`
+   * :doc:`pafi <fix_pafi>`
    * :doc:`phonon <fix_phonon>`
    * :doc:`pimd <fix_pimd>`
    * :doc:`planeforce <fix_planeforce>`
@@ -155,6 +161,7 @@ OPT.
    * :doc:`precession/spin <fix_precession_spin>`
    * :doc:`press/berendsen <fix_press_berendsen>`
    * :doc:`print <fix_print>`
+   * :doc:`propel/self <fix_propel_self>`
    * :doc:`property/atom (k) <fix_property_atom>`
    * :doc:`python/invoke <fix_python_invoke>`
    * :doc:`python/move <fix_python_move>`
@@ -188,15 +195,18 @@ OPT.
    * :doc:`rx (k) <fix_rx>`
    * :doc:`saed/vtk <fix_saed_vtk>`
    * :doc:`setforce (k) <fix_setforce>`
-   * :doc:`shake <fix_shake>`
+   * :doc:`setforce/spin <fix_setforce>`
+   * :doc:`shake (k) <fix_shake>`
    * :doc:`shardlow (k) <fix_shardlow>`
    * :doc:`smd <fix_smd>`
-   * :doc:`smd/adjust\_dt <fix_smd_adjust_dt>`
-   * :doc:`smd/integrate\_tlsph <fix_smd_integrate_tlsph>`
-   * :doc:`smd/integrate\_ulsph <fix_smd_integrate_ulsph>`
-   * :doc:`smd/move\_tri\_surf <fix_smd_move_triangulated_surface>`
+   * :doc:`smd/adjust_dt <fix_smd_adjust_dt>`
+   * :doc:`smd/integrate_tlsph <fix_smd_integrate_tlsph>`
+   * :doc:`smd/integrate_ulsph <fix_smd_integrate_ulsph>`
+   * :doc:`smd/move_tri_surf <fix_smd_move_triangulated_surface>`
    * :doc:`smd/setvel <fix_smd_setvel>`
-   * :doc:`smd/wall\_surface <fix_smd_wall_surface>`
+   * :doc:`smd/wall_surface <fix_smd_wall_surface>`
+   * :doc:`sph <fix_sph>`
+   * :doc:`sph/stationary <fix_sph_stationary>`
    * :doc:`spring <fix_spring>`
    * :doc:`spring/chunk <fix_spring_chunk>`
    * :doc:`spring/rg <fix_spring_rg>`
@@ -211,6 +221,8 @@ OPT.
    * :doc:`temp/rescale <fix_temp_rescale>`
    * :doc:`temp/rescale/eff <fix_temp_rescale_eff>`
    * :doc:`tfmc <fix_tfmc>`
+   * :doc:`tgnpt/drude <fix_tgnh_drude>`
+   * :doc:`tgnvt/drude <fix_tgnh_drude>`
    * :doc:`thermal/conductivity <fix_thermal_conductivity>`
    * :doc:`ti/spring <fix_ti_spring>`
    * :doc:`tmd <fix_tmd>`
@@ -233,8 +245,8 @@ OPT.
    * :doc:`wall/morse <fix_wall>`
    * :doc:`wall/piston <fix_wall_piston>`
    * :doc:`wall/reflect (k) <fix_wall_reflect>`
+   * :doc:`wall/reflect/stochastic <fix_wall_reflect_stochastic>`
    * :doc:`wall/region <fix_wall_region>`
    * :doc:`wall/region/ees <fix_wall_ees>`
    * :doc:`wall/srd <fix_wall_srd>`
-   *
-   *
+   * :doc:`widom <fix_widom>`

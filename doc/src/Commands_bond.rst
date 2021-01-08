@@ -13,7 +13,7 @@
 
 .. _bond:
 
-bond_style potentials
+Bond_style potentials
 =====================
 
 All LAMMPS :doc:`bond_style <bond_style>` commands.  Some styles have
@@ -35,6 +35,7 @@ OPT.
    * :doc:`class2 (ko) <bond_class2>`
    * :doc:`fene (iko) <bond_fene>`
    * :doc:`fene/expand (o) <bond_fene_expand>`
+   * :doc:`gaussian <bond_gaussian>`
    * :doc:`gromos (o) <bond_gromos>`
    * :doc:`harmonic (iko) <bond_harmonic>`
    * :doc:`harmonic/shift (o) <bond_harmonic_shift>`
@@ -44,16 +45,14 @@ OPT.
    * :doc:`nonlinear (o) <bond_nonlinear>`
    * :doc:`oxdna/fene <bond_oxdna>`
    * :doc:`oxdna2/fene <bond_oxdna>`
+   * :doc:`oxrna2/fene <bond_oxdna>`
    * :doc:`quartic (o) <bond_quartic>`
+   * :doc:`special <bond_special>`
    * :doc:`table (o) <bond_table>`
-   *
-   *
-
----
 
 .. _angle:
 
-angle_style potentials
+Angle_style potentials
 ======================
 
 All LAMMPS :doc:`angle_style <angle_style>` commands.  Some styles have
@@ -86,25 +85,22 @@ OPT.
    * :doc:`dipole (o) <angle_dipole>`
    * :doc:`fourier (o) <angle_fourier>`
    * :doc:`fourier/simple (o) <angle_fourier_simple>`
+   * :doc:`gaussian <angle_gaussian>` - multicentered Gaussian-based angle potential
    * :doc:`harmonic (iko) <angle_harmonic>`
    * :doc:`mm3 <angle_mm3>`
    * :doc:`quartic (o) <angle_quartic>`
    * :doc:`sdk (o) <angle_sdk>`
    * :doc:`table (o) <angle_table>`
-   *
-
----
 
 .. _dihedral:
 
-dihedral_style potentials
+Dihedral_style potentials
 =========================
 
 All LAMMPS :doc:`dihedral_style <dihedral_style>` commands.  Some styles
 have accelerated versions.  This is indicated by additional letters in
 parenthesis: g = GPU, i = USER-INTEL, k = KOKKOS, o = USER-OMP, t =
 OPT.
-
 
 .. table_from_list::
    :columns: 4
@@ -131,15 +127,13 @@ OPT.
    * :doc:`spherical <dihedral_spherical>`
    * :doc:`table (o) <dihedral_table>`
    * :doc:`table/cut <dihedral_table_cut>`
-   *
-   *
 
 .. _improper:
 
-improper_style potentials
+Improper_style potentials
 =========================
 
-All LAMMPS :doc:`improper\_style <improper_style>` commands.  Some styles
+All LAMMPS :doc:`improper_style <improper_style>` commands.  Some styles
 have accelerated versions.  This is indicated by additional letters in
 parenthesis: g = GPU, i = USER-INTEL, k = KOKKOS, o = USER-OMP, t =
 OPT.
@@ -166,4 +160,3 @@ OPT.
    * :doc:`ring (o) <improper_ring>`
    * :doc:`sqdistharm <improper_sqdistharm>`
    * :doc:`umbrella (o) <improper_umbrella>`
-   *

@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------------
    LAMMPS - Large-scale Atomic/Molecular Massively Parallel Simulator
-   http://lammps.sandia.gov, Sandia National Laboratories
+   https://lammps.sandia.gov/, Sandia National Laboratories
    Steve Plimpton, sjplimp@sandia.gov
 
    Copyright (2003) Sandia Corporation.  Under the terms of Contract
@@ -11,6 +11,7 @@
    See the README file in the top-level LAMMPS directory.
 ------------------------------------------------------------------------- */
 
+#include "omp_compat.h"
 #include "fix_nve_sphere_omp.h"
 #include <cmath>
 #include "atom.h"
@@ -49,7 +50,7 @@ void FixNVESphereOMP::initial_integrate(int /* vflag */)
   // update v,x,omega for all particles
   // d_omega/dt = torque / inertia
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)
+#pragma omp parallel for LMP_DEFAULT_NONE
 #endif
   for (int i = 0; i < nlocal; i++) {
     if (mask[i] & groupbit) {
@@ -76,7 +77,7 @@ void FixNVESphereOMP::initial_integrate(int /* vflag */)
     double * const * const mu = atom->mu;
     if (dlm == NODLM) {
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)
+#pragma omp parallel for LMP_DEFAULT_NONE
 #endif
       for (int i = 0; i < nlocal; i++) {
         double g0,g1,g2,msq,scale;
@@ -95,7 +96,7 @@ void FixNVESphereOMP::initial_integrate(int /* vflag */)
       }
     } else {
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)
+#pragma omp parallel for LMP_DEFAULT_NONE
 #endif
       // Integrate orientation following Dullweber-Leimkuhler-Maclachlan scheme
       for (int i = 0; i < nlocal; i++) {
@@ -125,7 +126,7 @@ void FixNVESphereOMP::initial_integrate(int /* vflag */)
           // Q = I + vx + vx^2 * (1-c)/s^2
 
           const double s2 = a[0]*a[0] + a[1]*a[1];
-          if (s2 != 0.0){ // i.e. the vectors are not parallel
+          if (s2 != 0.0) { // i.e. the vectors are not parallel
             const double scale = (1.0 - a[2])/s2;
 
             Q[0][0] = 1.0 - scale*a[0]*a[0]; Q[0][1] = -scale*a[0]*a[1];      Q[0][2] = -a[0];
@@ -223,7 +224,7 @@ void FixNVESphereOMP::final_integrate()
   // d_omega/dt = torque / inertia
 
 #if defined(_OPENMP)
-#pragma omp parallel for default(none)
+#pragma omp parallel for LMP_DEFAULT_NONE
 #endif
   for (int i = 0; i < nlocal; i++)
     if (mask[i] & groupbit) {
