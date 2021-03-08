@@ -1,4 +1,9 @@
 .. index:: pair_style oxdna2/excv
+.. index:: pair_style oxdna2/stk
+.. index:: pair_style oxdna2/hbond
+.. index:: pair_style oxdna2/xstk
+.. index:: pair_style oxdna2/coaxstk
+.. index:: pair_style oxdna2/dh
 
 pair_style oxdna2/excv command
 ==============================
@@ -21,7 +26,6 @@ pair_style oxdna2/dh command
 Syntax
 """"""
 
-
 .. code-block:: LAMMPS
 
    pair_style style1
@@ -32,7 +36,6 @@ Syntax
 
 * style2 = *oxdna2/excv* or *oxdna2/stk* or *oxdna2/hbond* or *oxdna2/xstk* or *oxdna2/coaxstk* or *oxdna2/dh*
 * args = list of arguments for these particular styles
-
 
 .. parsed-literal::
 
@@ -51,7 +54,6 @@ Syntax
 
 Examples
 """"""""
-
 
 .. code-block:: LAMMPS
 
@@ -74,9 +76,9 @@ excluded volume interaction *oxdna2/excv*\ , the stacking *oxdna2/stk*\ , cross-
 and coaxial stacking interaction *oxdna2/coaxstk*\ , electrostatic Debye-Hueckel interaction *oxdna2/dh*
 as well as the hydrogen-bonding interaction *oxdna2/hbond* between complementary pairs of nucleotides on
 opposite strands. Average sequence or sequence-dependent stacking and base-pairing strengths
-are supported :ref:`(Sulc) <Sulc2>`. Quasi-unique base-pairing between nucleotides can be achieved by using 
-more complementary pairs of atom types like 5-8 and 6-7, 9-12 and 10-11, 13-16 and 14-15, etc. 
-This prevents the hybridization of in principle complementary bases within Ntypes/4 bases 
+are supported :ref:`(Sulc) <Sulc2>`. Quasi-unique base-pairing between nucleotides can be achieved by using
+more complementary pairs of atom types like 5-8 and 6-7, 9-12 and 10-11, 13-16 and 14-15, etc.
+This prevents the hybridization of in principle complementary bases within Ntypes/4 bases
 up and down along the backbone.
 
 The exact functional form of the pair styles is rather complex.
@@ -112,10 +114,8 @@ Please cite also the relevant oxDNA2 publications
 
 ----------
 
-
 Restrictions
 """"""""""""
-
 
 These pair styles can only be used if LAMMPS was built with the
 USER-CGDNA package and the MOLECULE and ASPHERE package.  See the
@@ -129,8 +129,10 @@ Related commands
 :doc:`bond_style oxrna2/fene <bond_oxdna>`, :doc:`pair_style oxrna2/excv <pair_oxrna2>`,
 :doc:`fix nve/dotc/langevin <fix_nve_dotc_langevin>`
 
-**Default:** none
+Default
+"""""""
 
+none
 
 ----------
 

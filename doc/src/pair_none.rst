@@ -13,7 +13,6 @@ Syntax
 Examples
 """"""""
 
-
 .. code-block:: LAMMPS
 
    pair_style none
@@ -49,4 +48,7 @@ Related commands
 
 :doc:`pair_style zero <pair_zero>`
 
-**Default:** none
+Default
+"""""""
+
+none

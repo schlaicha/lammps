@@ -1,11 +1,10 @@
 .. index:: pair_style mm3/switch3/coulgauss/long
 
 pair_style mm3/switch3/coulgauss/long command
-==============================================
+=============================================
 
 Syntax
 """"""
-
 
 .. code-block:: LAMMPS
 
@@ -13,7 +12,6 @@ Syntax
 
 * style = *mm3/switch3/coulgauss/long*
 * args = list of arguments for a particular style
-
 
 .. parsed-literal::
 
@@ -24,7 +22,6 @@ Syntax
 
 Examples
 """"""""
-
 
 .. code-block:: LAMMPS
 
@@ -43,11 +40,10 @@ vdW potential :ref:`(Allinger) <mm3-allinger1989>`
 .. math::
 
    E & = \epsilon_{ij} \left[ -2.25 \left(\frac{r_{v,ij}}{r_{ij}}\right)^6 + 1.84(10)^5 \exp\left[-12.0 r_{ij}/r_{v,ij}\right] \right] S_3(r_{ij}) \\
-   r_{v,ij} & =  r_{v,i} + r_{v,j} \\ 
+   r_{v,ij} & =  r_{v,i} + r_{v,j} \\
    \epsilon_{ij} & = \sqrt{\epsilon_i \epsilon_j}
 
-
-, which goes smoothly to zero at the cutoff r\_c as defined
+, which goes smoothly to zero at the cutoff r_c as defined
 by the switching function
 
 .. math::
@@ -58,14 +54,12 @@ by the switching function
                        0 & \quad\mathrm{if}\quad r >= r_\mathrm{c}
                    \end{array} \right.
 
-
 where w is the width defined in the arguments. This potential
 is combined with Coulomb interaction between Gaussian charge densities:
 
 .. math::
 
    E = \frac{q_i q_j \mathrm{erf}\left( r/\sqrt{\gamma_1^2+\gamma_2^2} \right) }{\epsilon r_{ij}}
-
 
 where :math:`q_i` and :math:`q_j` are the charges on the 2 atoms,
 epsilon is the dielectric constant which can be set by the
@@ -90,7 +84,8 @@ commands:
 
 ----------
 
-**Mixing, shift, table, tail correction, restart, rRESPA info**\ :
+Mixing, shift, table, tail correction, restart, rRESPA info
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Mixing rules are fixed for this style as defined above.
 
@@ -100,7 +95,6 @@ function ensures that the potential is zero at the cut-off.
 Restrictions
 """"""""""""
 
-
 These styles are part of the USER-YAFF package.  They are only
 enabled if LAMMPS was built with that package.  See the :doc:`Build package <Build_package>` doc page for more info.
 
@@ -109,4 +103,7 @@ Related commands
 
 :doc:`pair_coeff <pair_coeff>`
 
-**Default:** none
+Default
+"""""""
+
+none

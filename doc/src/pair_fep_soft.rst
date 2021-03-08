@@ -1,68 +1,78 @@
 .. index:: pair_style lj/cut/soft
+.. index:: pair_style lj/cut/soft/omp
+.. index:: pair_style lj/cut/coul/cut/soft
+.. index:: pair_style lj/cut/coul/cut/soft/omp
+.. index:: pair_style lj/cut/coul/long/soft
+.. index:: pair_style lj/cut/coul/long/soft/omp
+.. index:: pair_style lj/cut/tip4p/long/soft
+.. index:: pair_style lj/cut/tip4p/long/soft/omp
+.. index:: pair_style lj/charmm/coul/long/soft
+.. index:: pair_style lj/charmm/coul/long/soft/omp
+.. index:: pair_style lj/class2/soft
+.. index:: pair_style lj/class2/coul/cut/soft
+.. index:: pair_style lj/class2/coul/long/soft
+.. index:: pair_style coul/cut/soft
+.. index:: pair_style coul/cut/soft/omp
+.. index:: pair_style coul/long/soft
+.. index:: pair_style coul/long/soft/omp
+.. index:: pair_style tip4p/long/soft
+.. index:: pair_style tip4p/long/soft/omp
+.. index:: pair_style morse/soft
 
 pair_style lj/cut/soft command
 ==============================
 
-pair_style lj/cut/soft/omp command
-==================================
+Accelerator Variants: *lj/cut/soft/omp*
 
 pair_style lj/cut/coul/cut/soft command
 =======================================
 
-pair_style lj/cut/coul/cut/soft/omp command
-===========================================
+Accelerator Variants: *lj/cut/coul/cut/soft/omp*
 
 pair_style lj/cut/coul/long/soft command
 ========================================
 
-pair_style lj/cut/coul/long/soft/omp command
-============================================
+Accelerator Variants: *lj/cut/coul/long/soft/omp*
 
 pair_style lj/cut/tip4p/long/soft command
-==========================================
+=========================================
 
-pair_style lj/cut/tip4p/long/soft/omp command
-==============================================
+Accelerator Variants: *lj/cut/tip4p/long/soft/omp*
 
 pair_style lj/charmm/coul/long/soft command
-============================================
-
-pair_style lj/charmm/coul/long/soft/omp command
-================================================
-
-pair_style lj/class2/soft command
-==================================
-
-pair_style lj/class2/coul/cut/soft command
 ===========================================
 
-pair_style lj/class2/coul/long/soft command
-============================================
+Accelerator Variants: *lj/charmm/coul/long/soft/omp*
 
-pair_style coul/cut/soft command
+pair_style lj/class2/soft command
 =================================
 
-pair_style coul/cut/soft/omp command
-=====================================
+pair_style lj/class2/coul/cut/soft command
+==========================================
+
+pair_style lj/class2/coul/long/soft command
+===========================================
+
+pair_style coul/cut/soft command
+================================
+
+Accelerator Variants: *coul/cut/soft/omp*
 
 pair_style coul/long/soft command
-==================================
+=================================
 
-pair_style coul/long/soft/omp command
-======================================
+Accelerator Variants: *coul/long/soft/omp*
 
 pair_style tip4p/long/soft command
-===================================
+==================================
 
-pair_style tip4p/long/soft/omp command
-=======================================
+Accelerator Variants: *tip4p/long/soft/omp*
 
 pair_style morse/soft command
-==============================
+=============================
 
 Syntax
 """"""
-
 
 .. code-block:: LAMMPS
 
@@ -70,7 +80,6 @@ Syntax
 
 * style = *lj/cut/soft* or *lj/cut/coul/cut/soft* or *lj/cut/coul/long/soft* or *lj/cut/tip4p/long/soft* or *lj/charmm/coul/long/soft* or *lj/class2/soft* or *lj/class2/coul/cut/soft* or *lj/class2/coul/long/soft* or *coul/cut/soft* or *coul/long/soft* or *tip4p/long/soft* or *morse/soft*
 * args = list of arguments for a particular style
-
 
 .. parsed-literal::
 
@@ -127,7 +136,6 @@ Syntax
 Examples
 """"""""
 
-
 .. code-block:: LAMMPS
 
    pair_style lj/cut/soft 2.0 0.5 9.5
@@ -164,11 +172,11 @@ Examples
 
    pair_style coul/long/soft 1.0 10.0 9.5
    pair_coeff * * 1.0
-   pair_coeff 1 1 1.0 9.5
+   pair_coeff 1 1 1.0
 
    pair_style tip4p/long/soft 1 2 7 8 0.15 2.0 0.5 10.0 9.8
    pair_coeff * * 1.0
-   pair_coeff 1 1 1.0 9.5
+   pair_coeff 1 1 1.0
 
    pair_style morse/soft 4 0.9 10.0
    pair_coeff * * 100.0 2.0 1.5 1.0
@@ -231,7 +239,6 @@ every 0.1.
 .. image:: JPG/lj_soft.jpg
 .. image:: JPG/coul_soft.jpg
 
-
 For the *lj/cut/coul/cut/soft* or *lj/cut/coul/long/soft* pair styles, as well
 as for the equivalent *class2* versions, the following coefficients must be
 defined for each pair of atoms types via the :doc:`pair_coeff <pair_coeff>`
@@ -246,7 +253,7 @@ or by mixing as described below:
 * cutoff2 (distance units)
 
 The latter two coefficients are optional.  If not specified, the global
-LJ and Coulombic cutoffs specified in the pair\_style command are used.
+LJ and Coulombic cutoffs specified in the pair_style command are used.
 If only one cutoff is specified, it is used as the cutoff for both LJ
 and Coulombic interactions for this type pair.  If both coefficients
 are specified, they are used as the LJ and Coulombic cutoffs for this
@@ -288,7 +295,9 @@ core.  Hence, if used by themselves, there will be no repulsion to keep two
 oppositely charged particles from overlapping each other. In this case, if
 :math:`\lambda = 1`, a singularity may occur.  These sub-styles are suitable to
 represent charges embedded in the Lennard-Jones radius of another site (for
-example hydrogen atoms in several water models).
+example hydrogen atoms in several water models). The :math:`\lambda` must
+be defined for each pair, and *coul/cut/soft* can accept an optional cutoff as
+the second coefficient.
 
 .. note::
 
@@ -313,9 +322,7 @@ example hydrogen atoms in several water models).
    the *coul/long/soft* or similar sub-style can be used via the
    :doc:`pair_style hybrid/overlay <pair_hybrid>` command.
 
-
 ----------
-
 
 The *morse/soft* variant modifies the :doc:`pair_morse <pair_morse>` style at
 short range to have a soft core. The functional form differs from that of the
@@ -345,34 +352,14 @@ The *morse/soft* style requires the following pair coefficients:
 The last coefficient is optional. If not specified, the global morse cutoff is
 used.
 
+----------
+
+.. include:: accel_styles.rst
 
 ----------
 
-
-Styles with a *gpu*\ , *intel*\ , *kk*\ , *omp*\ , or *opt* suffix are
-functionally the same as the corresponding style without the suffix.
-They have been optimized to run faster, depending on your available
-hardware, as discussed on the :doc:`Speed packages <Speed_packages>` doc
-page.  The accelerated styles take the same arguments and should
-produce the same results, except for round-off and precision issues.
-
-These accelerated styles are part of the GPU, USER-INTEL, KOKKOS,
-USER-OMP and OPT packages, respectively.  They are only enabled if
-LAMMPS was built with those packages.  See the :doc:`Build package <Build_package>` doc page for more info.
-
-You can specify the accelerated styles explicitly in your input script by
-including their suffix, or you can use the :doc:`-suffix command-line switch
-<Run_options>` when you invoke LAMMPS, or you can use the :doc:`suffix <suffix>`
-command in your input script.
-
-See the :doc:`Speed packages <Speed_packages>` doc page for more
-instructions on how to use the accelerated styles effectively.
-
-
-----------
-
-
-**Mixing, shift, tail correction, restart info**\ :
+Mixing, shift, table, tail correction, restart, rRESPA info
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The different versions of the *lj/cut/soft* pair styles support mixing.  For
 atom type pairs I,J and I != J, the :math:`\epsilon` and :math:`\sigma`
@@ -416,16 +403,13 @@ The *morse/soft* pair style does not support the :doc:`pair_modify
 pressure.
 
 All of these pair styles write information to :doc:`binary restart files
-<restart>`, so pair\_style and pair\_coeff commands do not need to be specified
+<restart>`, so pair_style and pair_coeff commands do not need to be specified
 in an input script that reads a restart file.
-
 
 ----------
 
-
 Restrictions
 """"""""""""
-
 
 The pair styles with soft core are only enabled if LAMMPS was built with the
 USER-FEP package. The *long* versions also require the KSPACE package to be
@@ -440,15 +424,14 @@ Related commands
 :doc:`pair_coeff <pair_coeff>`, :doc:`fix adapt <fix_adapt>`,
 :doc:`fix adapt/fep <fix_adapt_fep>`, :doc:`compute fep <compute_fep>`
 
-**Default:** none
+Default
+"""""""
 
+none
 
 ----------
 
-
 .. _Beutler:
-
-
 
 **(Beutler)** Beutler, Mark, van Schaik, Gerber, van Gunsteren, Chem
 Phys Lett, 222, 529 (1994).
