@@ -44,6 +44,8 @@ PairPolymorphic::PairPolymorphic(LAMMPS *lmp) : Pair(lmp)
   single_enable = 0;
   restartinfo = 0;
   one_coeff = 1;
+  manybody_flag = 1;
+  centroidstressflag = CENTROID_NOTAVAIL;
 
   nelements = 0;
   elements = nullptr;
@@ -644,7 +646,7 @@ void PairPolymorphic::read_file(char *file)
   MPI_Bcast(&npair, 1, MPI_INT, 0, world);
   MPI_Bcast(&ntriple, 1, MPI_INT, 0, world);
 
-  if(comm->me != 0) {
+  if (comm->me != 0) {
     delete [] match;
     match = new int[nelements];
     delete [] pairParameters;
