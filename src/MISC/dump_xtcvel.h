@@ -21,7 +21,6 @@ DumpStyle(xtc/vel,DumpXTCvel)
 #define LMP_DUMP_XTCVEL_H
 
 #include "dump.h"
-
 #include "xdr_compat.h"
 
 namespace LAMMPS_NS {
@@ -45,7 +44,7 @@ class DumpXTCvel : public Dump {
   void write_header(bigint);
   void pack(tagint *);
   void write_data(int, double *);
-  bigint memory_usage();
+  double memory_usage();
 
   void write_frame();
 };

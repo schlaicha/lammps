@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------------
    LAMMPS - Large-scale Atomic/Molecular Massively Parallel Simulator
-   http://lammps.sandia.gov, Sandia National Laboratories
+   https://lammps.sandia.gov/, Sandia National Laboratories
    Steve Plimpton, sjplimp@sandia.gov
 
    Copyright (2003) Sandia Corporation.  Under the terms of Contract
@@ -14,7 +14,7 @@
 /* ----------------------------------------------------------------------
    Contributing authors: Naveen Michaud-Agrawal (Johns Hopkins U)
                          open-source XDR routines from
-                           Frans van Hoesel (http://md.chem.rug.nl/hoesel)
+                           Frans van Hoesel (https://www.rug.nl/staff/f.h.j.van.hoesel/)
                            are included in this file
                          Axel Kohlmeyer (Temple U)
                            port to platforms without XDR support
@@ -22,12 +22,11 @@
                            support for groups
 ------------------------------------------------------------------------- */
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
 #include "dump_xtcvel.h"
+#include <cmath>
+
+#include <cstring>
+#include <climits>
 #include "domain.h"
 #include "atom.h"
 #include "update.h"
@@ -63,7 +62,7 @@ DumpXTCvel::DumpXTCvel(LAMMPS *lmp, int narg, char **arg) : Dump(lmp, narg, arg)
   size_one = 3;
   sort_flag = 1;
   sortcol = 0;
-  format_default = NULL;
+  format_default = nullptr;
   flush_flag = 0;
   precision = 1000.0;
 
@@ -137,9 +136,9 @@ void DumpXTCvel::init_style()
 void DumpXTCvel::openfile()
 {
   // XTC maintains it's own XDR file ptr
-  // set fp to NULL so parent dump class will not use it
+  // set fp to a null pointer so parent dump class will not use it
 
-  fp = NULL;
+  fp = nullptr;
   if (me == 0)
     if (xdropen(&xd,filename,"w") == 0) error->one(FLERR,"Cannot open dump file");
 }
@@ -252,7 +251,7 @@ int DumpXTCvel::modify_param(int narg, char **arg)
     return 2;
   } else if (strcmp(arg[0],"precision") == 0) {
     if (narg < 2) error->all(FLERR,"Illegal dump_modify command");
-    precision = force->numeric(FLERR,arg[1]);
+    precision = utils::numeric(FLERR,arg[1],false,lmp);
     if ((fabs(precision-10.0) > EPS) && (fabs(precision-100.0) > EPS) &&
         (fabs(precision-1000.0) > EPS) && (fabs(precision-10000.0) > EPS) &&
         (fabs(precision-100000.0) > EPS) &&
@@ -261,13 +260,13 @@ int DumpXTCvel::modify_param(int narg, char **arg)
     return 2;
   } else if (strcmp(arg[0],"sfactor") == 0) {
     if (narg < 2) error->all(FLERR,"Illegal dump_modify command");
-    sfactor = force->numeric(FLERR,arg[1]);
+    sfactor = utils::numeric(FLERR,arg[1],false,lmp);
     if (sfactor <= 0.0)
       error->all(FLERR,"Illegal dump_modify sfactor value (must be > 0.0)");
     return 2;
   } else if (strcmp(arg[0],"tfactor") == 0) {
     if (narg < 2) error->all(FLERR,"Illegal dump_modify command");
-    tfactor = force->numeric(FLERR,arg[1]);
+    tfactor = utils::numeric(FLERR,arg[1],false,lmp);
     if (tfactor <= 0.0)
       error->all(FLERR,"Illegal dump_modify tfactor value (must be > 0.0)");
     return 2;
@@ -279,9 +278,9 @@ int DumpXTCvel::modify_param(int narg, char **arg)
    return # of bytes of allocated memory in buf and global coords array
 ------------------------------------------------------------------------- */
 
-bigint DumpXTCvel::memory_usage()
+double DumpXTCvel::memory_usage()
 {
-  bigint bytes = Dump::memory_usage();
+  double bytes = Dump::memory_usage();
   bytes += memory->usage(coords,natoms*3);
   return bytes;
 }
